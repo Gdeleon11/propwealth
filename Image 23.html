@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Upcoming Deadlines | PropWealth</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#402500",
+                    "on-background": "#191c1d",
+                    "inverse-on-surface": "#f0f1f2",
+                    "secondary": "#006e25",
+                    "outline": "#75777e",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ffddb9",
+                    "primary": "#031632",
+                    "surface-container-low": "#f3f4f5",
+                    "surface-container-high": "#e7e8e9",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#663e00",
+                    "tertiary-fixed-dim": "#ffb961",
+                    "surface-tint": "#4e5f7e",
+                    "secondary-fixed": "#83fc8e",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#007327",
+                    "primary-fixed-dim": "#b6c7eb",
+                    "surface-variant": "#e1e3e4",
+                    "on-error-container": "#93000a",
+                    "primary-container": "#1a2b48",
+                    "on-primary-fixed-variant": "#374765",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-fixed-variant": "#00531a",
+                    "on-secondary-fixed": "#002106",
+                    "secondary-container": "#80f98b",
+                    "outline-variant": "#c5c6ce",
+                    "surface": "#f8f9fa",
+                    "on-tertiary-fixed": "#2b1700",
+                    "on-surface-variant": "#44474d",
+                    "inverse-primary": "#b6c7eb",
+                    "tertiary": "#241300",
+                    "surface-container-highest": "#e1e3e4",
+                    "primary-fixed": "#d7e2ff",
+                    "on-primary-fixed": "#081b38",
+                    "error": "#ba1a1a",
+                    "secondary-fixed-dim": "#66df75",
+                    "surface-dim": "#d9dadb",
+                    "surface-container": "#edeeef",
+                    "on-tertiary-container": "#cd8100",
+                    "on-primary-container": "#8293b5",
+                    "inverse-surface": "#2e3132",
+                    "background": "#f8f9fa",
+                    "on-surface": "#191c1d",
+                    "surface-bright": "#f8f9fa",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "base": "8px",
+                    "stack-md": "12px",
+                    "container-padding": "24px",
+                    "stack-lg": "24px",
+                    "gutter": "16px",
+                    "stack-sm": "4px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "stat-xl": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "data-mono": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "stat-xl": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+      }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen font-body-md pb-32">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding py-base max-w-7xl mx-auto bg-surface dark:bg-surface-container-low border-b border-outline-variant">
+<div class="flex items-center gap-gutter">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container border border-outline-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">PropWealth</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+</header>
+<main class="pt-24 px-container-padding max-w-4xl mx-auto space-y-stack-lg">
+<!-- View Toggle & Header -->
+<div class="flex items-center justify-between">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">Upcoming Deadlines</h2>
+<div class="flex bg-surface-container rounded-lg p-1">
+<button class="px-4 py-1.5 rounded-md font-label-caps text-label-caps transition-all bg-primary text-on-primary shadow-sm" id="btn-calendar" onclick="toggleView('calendar')">CALENDAR</button>
+<button class="px-4 py-1.5 rounded-md font-label-caps text-label-caps transition-all text-on-surface-variant hover:text-primary" id="btn-list" onclick="toggleView('list')">LIST</button>
+</div>
+</div>
+<!-- Legend (Always Visible) -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter bg-surface-container-lowest p-gutter rounded-xl border border-outline-variant">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-secondary"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">RENT</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-primary-fixed-dim"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">SERVICES</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-tertiary-fixed-dim"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">MAINTENANCE</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-error"></div>
+<span class="font-label-caps text-label-caps text-on-surface-variant">CONTRACT</span>
+</div>
+</div>
+<!-- Calendar View -->
+<section class="space-y-stack-md transition-opacity duration-300" id="calendar-view">
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<div class="p-gutter border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<span class="font-headline-lg-mobile text-headline-lg-mobile font-semibold text-primary">October 2023</span>
+<div class="flex gap-2">
+<button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center hover:bg-surface-container-high"><span class="material-symbols-outlined text-[18px]">chevron_left</span></button>
+<button class="w-8 h-8 rounded border border-outline-variant flex items-center justify-center hover:bg-surface-container-high"><span class="material-symbols-outlined text-[18px]">chevron_right</span></button>
+</div>
+</div>
+<div class="grid grid-cols-7 text-center">
+<!-- Days of week -->
+<div class="py-3 font-label-caps text-label-caps text-outline-variant border-b border-outline-variant">MON</div>
+<div class="py-3 font-label-caps text-label-caps text-outline-variant border-b border-outline-variant">TUE</div>
+<div class="py-3 font-label-caps text-label-caps text-outline-variant border-b border-outline-variant">WED</div>
+<div class="py-3 font-label-caps text-label-caps text-outline-variant border-b border-outline-variant">THU</div>
+<div class="py-3 font-label-caps text-label-caps text-outline-variant border-b border-outline-variant">FRI</div>
+<div class="py-3 font-label-caps text-label-caps text-outline-variant border-b border-outline-variant">SAT</div>
+<div class="py-3 font-label-caps text-label-caps text-outline-variant border-b border-outline-variant">SUN</div>
+<!-- Calendar Grid (Placeholders) -->
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-outline-variant">25</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-outline-variant">26</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-outline-variant">27</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-outline-variant">28</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-outline-variant">29</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-outline-variant">30</div>
+<div class="h-16 md:h-24 border-b border-outline-variant p-1 text-left text-on-surface">1</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface">2</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface bg-error/5 relative overflow-hidden">
+<span>3</span>
+<div class="mt-1 w-full h-1 bg-error rounded-full"></div>
+</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface">4</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface">5</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface bg-secondary/5">
+<span>6</span>
+<div class="mt-1 w-full h-1 bg-secondary rounded-full"></div>
+</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface">7</div>
+<div class="h-16 md:h-24 border-b border-outline-variant p-1 text-left text-on-surface">8</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface">9</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface bg-primary-fixed-dim/10">
+<span>10</span>
+<div class="mt-1 w-full h-1 bg-primary-fixed-dim rounded-full"></div>
+</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface font-bold">11
+                        <div class="mt-1 w-2 h-2 mx-auto bg-primary rounded-full"></div>
+</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface">12</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface">13</div>
+<div class="h-16 md:h-24 border-r border-b border-outline-variant p-1 text-left text-on-surface">14</div>
+<div class="h-16 md:h-24 border-b border-outline-variant p-1 text-left text-on-surface bg-tertiary-fixed-dim/10">
+<span>15</span>
+<div class="mt-1 w-full h-1 bg-tertiary-fixed-dim rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Events List -->
+<section class="space-y-base" id="list-view">
+<h3 class="font-label-caps text-label-caps text-outline px-1">TODAY - OCTOBER 11</h3>
+<!-- Overdue Alert Style -->
+<div class="group relative bg-error-container border-l-4 border-error p-gutter rounded-lg shadow-sm flex items-center justify-between hover:translate-x-1 transition-transform cursor-pointer">
+<div class="flex items-center gap-gutter">
+<div class="w-12 h-12 bg-error rounded-xl flex items-center justify-center text-on-error">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<div>
+<h4 class="font-body-md font-bold text-on-error-container">Vencimiento de Renta - Apt 402</h4>
+<p class="text-label-caps font-label-caps text-on-error-container opacity-80">OVERDUE BY 2 DAYS • $1,250.00</p>
+</div>
+</div>
+<button class="bg-error text-on-error font-label-caps text-label-caps px-4 py-2 rounded shadow-md group-active:scale-95 transition-all">RESOLVE</button>
+</div>
+<h3 class="font-label-caps text-label-caps text-outline px-1 pt-stack-md">UPCOMING</h3>
+<!-- Maintenance Event -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-lg flex items-center gap-gutter hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-12 h-12 bg-tertiary-fixed-dim/20 text-tertiary-fixed-dim rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined">build</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-md font-bold text-primary">Mantenimiento de Jardines - Villa del Mar</h4>
+<p class="text-label-caps font-label-caps text-on-surface-variant">OCT 15 • 09:00 AM • FACILITY SERVICE</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+<!-- Service Payment -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-lg flex items-center gap-gutter hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-12 h-12 bg-primary-fixed-dim/20 text-primary-fixed-dim rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined">wifi</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-md font-bold text-primary">Pago de Internet - Skyline Loft</h4>
+<p class="text-label-caps font-label-caps text-on-surface-variant">OCT 18 • $85.00 • AUTOMATIC DEBIT</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+<!-- Contract Expiry -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-lg flex items-center gap-gutter hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-12 h-12 bg-error/10 text-error rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-md font-bold text-primary">Fin de Contrato - Elena Martinez</h4>
+<p class="text-label-caps font-label-caps text-on-surface-variant">OCT 25 • RENEWAL REVIEW • APT 201</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+<!-- More Rent -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-lg flex items-center gap-gutter hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-12 h-12 bg-secondary/10 text-secondary rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<div class="flex-1">
+<h4 class="font-body-md font-bold text-primary">Vencimiento de Renta - Studio 15</h4>
+<p class="text-label-caps font-label-caps text-on-surface-variant">NOV 01 • $950.00 • PENDING</p>
+</div>
+<span class="material-symbols-outlined text-outline-variant">chevron_right</span>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-gutter py-stack-md bg-primary dark:bg-surface-container-lowest border-t border-outline-variant shadow-sm">
+<button class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-label-caps text-label-caps">Properties</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary-fixed dark:text-secondary font-bold hover:bg-primary-container dark:hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">analytics</span>
+<span class="font-label-caps text-label-caps">Reports</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-label-caps">Payments</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</button>
+</nav>
+<script>
+        function toggleView(view) {
+            const calView = document.getElementById('calendar-view');
+            const listView = document.getElementById('list-view');
+            const btnCal = document.getElementById('btn-calendar');
+            const btnList = document.getElementById('btn-list');
+
+            if (view === 'calendar') {
+                calView.classList.remove('hidden');
+                btnCal.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+                btnCal.classList.remove('text-on-surface-variant');
+                btnList.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+                btnList.classList.add('text-on-surface-variant');
+            } else {
+                calView.classList.add('hidden');
+                btnList.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+                btnList.classList.remove('text-on-surface-variant');
+                btnCal.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+                btnCal.classList.add('text-on-surface-variant');
+            }
+        }
+
+        // Initialize view
+        document.addEventListener('DOMContentLoaded', () => {
+            // No action needed if calendar is default
+        });
+    </script>
+</body></html>

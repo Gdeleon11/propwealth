@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Add New Property | PropWealth</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#4e5f7e",
+                        "surface-container-low": "#f3f4f5",
+                        "outline-variant": "#c5c6ce",
+                        "inverse-surface": "#2e3132",
+                        "tertiary-fixed-dim": "#ffb961",
+                        "primary": "#031632",
+                        "on-tertiary-fixed-variant": "#663e00",
+                        "on-primary-fixed": "#081b38",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#402500",
+                        "on-tertiary-container": "#cd8100",
+                        "on-secondary-fixed-variant": "#00531a",
+                        "inverse-primary": "#b6c7eb",
+                        "primary-container": "#1a2b48",
+                        "on-background": "#191c1d",
+                        "surface-variant": "#e1e3e4",
+                        "primary-fixed-dim": "#b6c7eb",
+                        "surface-dim": "#d9dadb",
+                        "error-container": "#ffdad6",
+                        "surface": "#f8f9fa",
+                        "surface-container": "#edeeef",
+                        "surface-bright": "#f8f9fa",
+                        "on-tertiary-fixed": "#2b1700",
+                        "on-error": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed": "#83fc8e",
+                        "on-secondary-container": "#007327",
+                        "on-surface": "#191c1d",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-container-high": "#e7e8e9",
+                        "primary-fixed": "#d7e2ff",
+                        "on-primary-container": "#8293b5",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed-dim": "#66df75",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#f0f1f2",
+                        "secondary": "#006e25",
+                        "secondary-container": "#80f98b",
+                        "on-primary-fixed-variant": "#374765",
+                        "tertiary": "#241300",
+                        "tertiary-fixed": "#ffddb9",
+                        "on-surface-variant": "#44474d",
+                        "background": "#f8f9fa",
+                        "outline": "#75777e",
+                        "on-secondary-fixed": "#002106"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "stack-lg": "24px",
+                        "base": "8px",
+                        "stack-md": "12px",
+                        "gutter": "16px",
+                        "container-padding": "24px",
+                        "stack-sm": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-md": ["Inter"],
+                        "stat-xl": ["Inter"],
+                        "display-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "stat-xl": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .step-active { color: #031632; font-weight: 700; border-bottom: 2px solid #031632; }
+        .step-inactive { color: #75777e; }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #031632 !important;
+            ring: 0 !important;
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c5c6ce; border-radius: 10px; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24 md:pb-0">
+<!-- Top Navigation Header -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding py-base max-w-7xl mx-auto bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-stack-md">
+<span class="material-symbols-outlined text-primary text-3xl">domain</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">PropWealth</h1>
+</div>
+<div class="flex items-center gap-stack-lg">
+<!-- Language Toggle -->
+<button class="flex items-center gap-1 px-3 py-1.5 rounded-full border border-outline-variant hover:bg-surface-container-high transition-colors group">
+<span class="material-symbols-outlined text-sm">language</span>
+<span class="font-label-caps text-label-caps uppercase">EN</span>
+<span class="material-symbols-outlined text-sm opacity-50 group-hover:rotate-180 transition-transform">expand_more</span>
+</button>
+<div class="hidden md:flex items-center gap-gutter">
+<span class="material-symbols-outlined p-2 rounded-full hover:bg-surface-container-high cursor-pointer transition-colors">notifications</span>
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a senior property executive in a minimalist studio. The lighting is crisp and clean, reflecting a high-end corporate fintech aesthetic. The background is a soft, warm gray that complements a dark navy blue suit. The overall mood is confident, trustworthy, and sophisticated." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9SaQUeDe11Gfdy8PZCSGA4WK3Pgnnl4gELhJxiIHMpDJ2CBgNEAGHX5OCyd2ByqoGsC9OpAVDiRBKCwJiaoVhD0zR0_xkTCqiI4SN3OQMm7Ewc-iddpX3XUu3XcamVid9emUrlhOhE2AkUCBqaXU-lBAvDM5hNUnrXTTq1tSKkacD1j5DE24qFPoYjm7W1fGHQho2cWn09v6yhK8GmrN1Y_NU4aOuj8r8Nf-Zk_6fWdkmkDdpBuSixw"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-12 px-container-padding max-w-5xl mx-auto">
+<!-- Header & Breadcrumb -->
+<div class="mb-stack-lg">
+<div class="flex items-center gap-2 text-on-surface-variant font-label-caps text-label-caps mb-2">
+<span>PROPERTIES</span>
+<span class="material-symbols-outlined text-xs">chevron_right</span>
+<span class="text-primary">ADD NEW PROPERTY</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Property Asset Registration</h2>
+<p class="text-on-surface-variant font-body-md mt-1">Provide accurate financial and structural details to incorporate this asset into your portfolio.</p>
+</div>
+<!-- Form Container -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-stack-lg">
+<!-- Left Sidebar Navigation (Desktop) -->
+<div class="lg:col-span-3">
+<nav class="flex lg:flex-col gap-4 border-b lg:border-b-0 lg:border-l border-outline-variant">
+<button class="flex items-center gap-3 px-4 py-2 lg:border-l-2 border-primary -ml-[2px] transition-all text-primary font-bold">
+<span class="material-symbols-outlined text-[20px]">info</span>
+<span class="font-label-caps text-label-caps">BASIC INFO</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+<span class="font-label-caps text-label-caps uppercase">FINANCIALS</span>
+</button>
+<button class="flex items-center gap-3 px-4 py-2 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">photo_camera</span>
+<span class="font-label-caps text-label-caps uppercase">MEDIA</span>
+</button>
+</nav>
+</div>
+<!-- Main Form Canvas -->
+<div class="lg:col-span-9">
+<form class="space-y-gutter">
+<!-- Section: Basic Information -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-lg shadow-sm">
+<div class="flex items-center gap-2 mb-stack-lg pb-stack-md border-b border-surface-container">
+<span class="material-symbols-outlined text-primary">description</span>
+<h3 class="font-label-caps text-label-caps text-primary uppercase tracking-widest">General Asset Details</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="md:col-span-2">
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Property Name</label>
+<input class="w-full bg-surface-container-low border-outline-variant text-body-md py-3 px-4 rounded-lg focus:ring-0" placeholder="e.g., Skyline Executive Suite 402" type="text"/>
+</div>
+<div class="md:col-span-2">
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Full Address</label>
+<textarea class="w-full bg-surface-container-low border-outline-variant text-body-md py-3 px-4 rounded-lg focus:ring-0" placeholder="Street, Unit Number, City, State, ZIP" rows="2"></textarea>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Property Type</label>
+<select class="w-full bg-surface-container-low border-outline-variant text-body-md py-3 px-4 rounded-lg focus:ring-0 appearance-none">
+<option>Select Type</option>
+<option>Apartment</option>
+<option>House</option>
+<option>Commercial</option>
+<option>Industrial</option>
+<option>Retail</option>
+</select>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Investment Status</label>
+<select class="w-full bg-surface-container-low border-outline-variant text-body-md py-3 px-4 rounded-lg focus:ring-0 appearance-none">
+<option>Owned</option>
+<option>Leased</option>
+<option>Management Only</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Section: Financial Metrics -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-lg shadow-sm">
+<div class="flex items-center gap-2 mb-stack-lg pb-stack-md border-b border-surface-container">
+<span class="material-symbols-outlined text-secondary">account_balance</span>
+<h3 class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Financial Oversight</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Purchase Value</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-data-mono">$</span>
+<input class="w-full bg-surface-container-low border-outline-variant text-body-md py-3 pl-8 pr-4 rounded-lg focus:ring-0 font-data-mono" placeholder="0.00" type="number"/>
+</div>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Target Monthly Rent</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-data-mono">$</span>
+<input class="w-full bg-surface-container-low border-outline-variant text-body-md py-3 pl-8 pr-4 rounded-lg focus:ring-0 font-data-mono" placeholder="0.00" type="number"/>
+</div>
+</div>
+<div>
+<label class="block font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Security Deposit</label>
+<div class="relative">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant font-data-mono">$</span>
+<input class="w-full bg-surface-container-low border-outline-variant text-body-md py-3 pl-8 pr-4 rounded-lg focus:ring-0 font-data-mono" placeholder="0.00" type="number"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Media Upload -->
+<div class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-lg shadow-sm">
+<div class="flex items-center gap-2 mb-stack-lg pb-stack-md border-b border-surface-container">
+<span class="material-symbols-outlined text-primary">cloud_upload</span>
+<h3 class="font-label-caps text-label-caps text-primary uppercase tracking-widest">Asset Documentation</h3>
+</div>
+<div class="border-2 border-dashed border-outline-variant rounded-lg p-stack-lg flex flex-col items-center justify-center text-center hover:bg-surface-container transition-colors cursor-pointer group">
+<div class="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mb-stack-md group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-3xl">add_a_photo</span>
+</div>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-primary mb-1">Click to upload or drag and drop</p>
+<p class="text-on-surface-variant text-body-md mb-gutter">PNG, JPG or WEBP (Max. 10MB per image)</p>
+<div class="flex gap-gutter">
+<div class="w-20 h-20 rounded border border-outline-variant overflow-hidden bg-surface">
+<img class="w-full h-full object-cover opacity-50" data-alt="A clean, minimalist interior shot of a modern apartment with floor-to-ceiling windows and polished concrete floors. The space is filled with natural daylight, highlighting the premium finishes and spacious layout. The color palette features whites, grays, and deep navy accents, aligning with a corporate luxury property aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABbo-wD_EwSTUaLNAn4sORynA6ocAALYVoRexZUTrJen5Wf-VleBHUpx09Fr3QX8uM6riHOn94BLLU0Q3QTmrz0XicMy0kDFItc16N88dDX7SDVzE1dtTFBGkYYLfR1WgEu3lVTM2fAxO5Bo1FeSItODlMZXJOXWXU3VsAstO3OkkGyvT2Kp8Ye3Bql13KcOjQ67AWKBHTCLYSxf0KMP64J8QHbxXGaPzXfzMNvgVNHT0BcvLSvmYU9g"/>
+</div>
+<div class="w-20 h-20 rounded border border-outline-variant overflow-hidden bg-surface flex items-center justify-center">
+<span class="material-symbols-outlined text-outline-variant">image</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex flex-col md:flex-row gap-gutter pt-gutter border-t border-outline-variant">
+<button class="flex-1 py-4 px-gutter border border-outline text-primary font-bold rounded-lg hover:bg-surface-container-high transition-all active:scale-95" type="button">
+                            SAVE AS DRAFT
+                        </button>
+<button class="flex-[2] py-4 px-gutter bg-primary text-white font-bold rounded-lg hover:bg-primary-container transition-all shadow-md active:scale-95 flex items-center justify-center gap-2" type="submit">
+                            SUBMIT ASSET TO PORTFOLIO
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-center px-gutter py-stack-md bg-primary border-t border-outline-variant shadow-sm">
+<a class="flex flex-col items-center justify-center text-on-primary opacity-70" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary-fixed font-bold" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-label-caps text-label-caps mt-1">Properties</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary opacity-70" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-label-caps mt-1">Payments</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary opacity-70" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps mt-1">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary opacity-70" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps mt-1">Settings</span>
+</a>
+</nav>
+<!-- Success Toast (Hidden by default) -->
+<div class="fixed top-24 right-container-padding z-[100] transform translate-x-[200%] transition-transform duration-500 ease-in-out" id="toast">
+<div class="bg-surface-container-lowest border border-secondary p-gutter rounded-lg shadow-xl flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">check_circle</span>
+</div>
+<div>
+<p class="font-bold text-primary">Asset Draft Saved</p>
+<p class="text-on-surface-variant text-sm">Draft will be available in your portfolio.</p>
+</div>
+<button class="text-on-surface-variant hover:text-primary" onclick="hideToast()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+</div>
+<script>
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.transform = 'translateX(0)';
+            setTimeout(() => {
+                hideToast();
+            }, 4000);
+        }
+
+        function hideToast() {
+            const toast = document.getElementById('toast');
+            toast.style.transform = 'translateX(200%)';
+        }
+
+        // Event listener for "Save as Draft" to show interaction
+        document.querySelector('button[type="button"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            showToast();
+        });
+
+        // Simple form validation visual cue
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => {
+                if(input.value.trim() !== '') {
+                    input.classList.add('border-secondary');
+                } else {
+                    input.classList.remove('border-secondary');
+                }
+            });
+        });
+    </script>
+</body></html>

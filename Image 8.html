@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html class="light" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Añadir Propiedad | PropWealth</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .custom-shadow {
+            box-shadow: 0 2px 8px rgba(3, 22, 50, 0.04);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #031632 !important;
+            ring: 0 !important;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-tint": "#4e5f7e",
+                      "surface-container-low": "#f3f4f5",
+                      "outline-variant": "#c5c6ce",
+                      "inverse-surface": "#2e3132",
+                      "tertiary-fixed-dim": "#ffb961",
+                      "primary": "#031632",
+                      "on-tertiary-fixed-variant": "#663e00",
+                      "on-primary-fixed": "#081b38",
+                      "on-tertiary": "#ffffff",
+                      "tertiary-container": "#402500",
+                      "on-tertiary-container": "#cd8100",
+                      "on-secondary-fixed-variant": "#00531a",
+                      "inverse-primary": "#b6c7eb",
+                      "primary-container": "#1a2b48",
+                      "on-background": "#191c1d",
+                      "surface-variant": "#e1e3e4",
+                      "primary-fixed-dim": "#b6c7eb",
+                      "surface-dim": "#d9dadb",
+                      "error-container": "#ffdad6",
+                      "surface": "#f8f9fa",
+                      "surface-container": "#edeeef",
+                      "surface-bright": "#f8f9fa",
+                      "on-tertiary-fixed": "#2b1700",
+                      "on-error": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-fixed": "#83fc8e",
+                      "on-secondary-container": "#007327",
+                      "on-surface": "#191c1d",
+                      "on-secondary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "surface-container-highest": "#e1e3e4",
+                      "surface-container-high": "#e7e8e9",
+                      "primary-fixed": "#d7e2ff",
+                      "on-primary-container": "#8293b5",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed-dim": "#66df75",
+                      "error": "#ba1a1a",
+                      "inverse-on-surface": "#f0f1f2",
+                      "secondary": "#006e25",
+                      "secondary-container": "#80f98b",
+                      "on-primary-fixed-variant": "#374765",
+                      "tertiary": "#241300",
+                      "tertiary-fixed": "#ffddb9",
+                      "on-surface-variant": "#44474d",
+                      "background": "#f8f9fa",
+                      "outline": "#75777e",
+                      "on-secondary-fixed": "#002106"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "stack-lg": "24px",
+                      "base": "8px",
+                      "stack-md": "12px",
+                      "gutter": "16px",
+                      "container-padding": "24px",
+                      "stack-sm": "4px"
+              },
+              "fontFamily": {
+                      "headline-lg": ["Inter"],
+                      "data-mono": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "label-caps": ["Inter"],
+                      "body-md": ["Inter"],
+                      "stat-xl": ["Inter"],
+                      "display-lg": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "stat-xl": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface bg-surface min-h-screen pb-24 md:pb-0">
+<!-- Top Navigation (Shell Implementation) -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding py-base max-w-7xl mx-auto bg-surface border-b border-outline-variant">
+<div class="flex items-center gap-stack-md">
+<span class="material-symbols-outlined text-primary font-bold text-headline-lg-mobile">domain</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">PropWealth</h1>
+</div>
+<div class="flex items-center gap-gutter">
+<!-- Language Switch -->
+<div class="hidden md:flex items-center bg-surface-container rounded-full px-base py-stack-sm border border-outline-variant">
+<button class="px-stack-md py-1 rounded-full text-label-caps font-label-caps bg-primary text-on-primary">ES</button>
+<button class="px-stack-md py-1 rounded-full text-label-caps font-label-caps text-on-surface-variant hover:bg-surface-container-high transition-colors">EN</button>
+</div>
+<div class="flex items-center gap-stack-md">
+<span class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-2 rounded-full cursor-pointer transition-colors" data-icon="notifications">notifications</span>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container text-xs font-bold">EP</div>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 px-container-padding max-w-5xl mx-auto">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-gutter mb-stack-lg">
+<div>
+<nav class="flex items-center gap-2 text-on-surface-variant mb-base">
+<span class="text-label-caps font-label-caps">PROPIEDADES</span>
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+<span class="text-label-caps font-label-caps text-primary">NUEVA ENTRADA</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-primary">Agregar Nueva Propiedad</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Complete los detalles financieros y estructurales del activo.</p>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="px-gutter py-stack-md border border-outline text-primary rounded-lg font-label-caps text-label-caps hover:bg-surface-container-low transition-all">
+                    CANCELAR
+                </button>
+<button class="px-gutter py-stack-md bg-primary text-on-primary rounded-lg font-label-caps text-label-caps hover:opacity-90 shadow-sm transition-all flex items-center gap-base">
+<span class="material-symbols-outlined text-sm">save</span>
+                    GUARDAR PROPIEDAD
+                </button>
+</div>
+</div>
+<!-- Form Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-stack-lg pb-12">
+<!-- Main Form Card -->
+<div class="lg:col-span-8 space-y-stack-lg">
+<section class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl custom-shadow">
+<div class="flex items-center gap-base mb-stack-lg border-b border-outline-variant pb-stack-md">
+<span class="material-symbols-outlined text-primary">info</span>
+<h3 class="font-label-caps text-label-caps text-primary tracking-widest">INFORMACIÓN GENERAL</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="space-y-stack-sm md:col-span-2">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">NOMBRE DE LA PROPIEDAD</label>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg px-gutter py-stack-md font-body-md text-body-md focus:border-primary transition-colors" placeholder="Ej: Residencia Los Olivos - Bloque A" type="text"/>
+</div>
+<div class="space-y-stack-sm md:col-span-2">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">DIRECCIÓN COMPLETA</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-gutter top-1/2 -translate-y-1/2 text-on-surface-variant">location_on</span>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-12 pr-gutter py-stack-md font-body-md text-body-md focus:border-primary transition-colors" placeholder="Calle, Número, Ciudad, CP" type="text"/>
+</div>
+</div>
+<div class="space-y-stack-sm">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">TIPO DE PROPIEDAD</label>
+<select class="w-full bg-surface-bright border border-outline-variant rounded-lg px-gutter py-stack-md font-body-md text-body-md appearance-none focus:border-primary transition-colors">
+<option>Apartamento</option>
+<option>Casa</option>
+<option>Local Comercial</option>
+<option>Oficina</option>
+<option>Terreno</option>
+</select>
+</div>
+<div class="space-y-stack-sm">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">ESTADO DE DISPONIBILIDAD</label>
+<div class="flex items-center h-[42px] gap-stack-md">
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container text-label-caps font-label-caps">Disponible</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div>
+</label>
+</div>
+</div>
+</div>
+</section>
+<section class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl custom-shadow">
+<div class="flex items-center gap-base mb-stack-lg border-b border-outline-variant pb-stack-md">
+<span class="material-symbols-outlined text-primary">payments</span>
+<h3 class="font-label-caps text-label-caps text-primary tracking-widest">MÉTRICAS FINANCIERAS</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<div class="space-y-stack-sm">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">VALOR DE COMPRA</label>
+<div class="relative">
+<span class="absolute left-gutter top-1/2 -translate-y-1/2 font-bold text-primary">$</span>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-8 pr-gutter py-stack-md font-data-mono text-data-mono focus:border-primary transition-colors" placeholder="0.00" type="number"/>
+</div>
+</div>
+<div class="space-y-stack-sm">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">RENTA MENSUAL</label>
+<div class="relative">
+<span class="absolute left-gutter top-1/2 -translate-y-1/2 font-bold text-secondary">$</span>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-8 pr-gutter py-stack-md font-data-mono text-data-mono focus:border-primary transition-colors" placeholder="0.00" type="number"/>
+</div>
+</div>
+<div class="space-y-stack-sm">
+<label class="block font-label-caps text-label-caps text-on-surface-variant">DEPÓSITO SEGURIDAD</label>
+<div class="relative">
+<span class="absolute left-gutter top-1/2 -translate-y-1/2 font-bold text-on-surface-variant">$</span>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-8 pr-gutter py-stack-md font-data-mono text-data-mono focus:border-primary transition-colors" placeholder="0.00" type="number"/>
+</div>
+</div>
+</div>
+<div class="mt-gutter p-base bg-surface-container rounded-lg border border-outline-variant/30">
+<div class="flex justify-between items-center px-base">
+<span class="text-label-caps font-label-caps text-on-surface-variant">RENDIMIENTO ESTIMADO (ROI)</span>
+<span class="font-data-mono text-data-mono text-secondary font-bold">8.4% ANUAL</span>
+</div>
+</div>
+</section>
+</div>
+<!-- Sidebar / Media Upload Card -->
+<div class="lg:col-span-4 space-y-stack-lg">
+<section class="bg-surface-container-lowest border border-outline-variant p-gutter rounded-xl custom-shadow h-full flex flex-col">
+<div class="flex items-center gap-base mb-stack-lg border-b border-outline-variant pb-stack-md">
+<span class="material-symbols-outlined text-primary">photo_camera</span>
+<h3 class="font-label-caps text-label-caps text-primary tracking-widest">MULTIMEDIA</h3>
+</div>
+<div class="flex-grow">
+<div class="group relative w-full h-64 border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center bg-surface-container-low hover:bg-surface-container-high transition-all cursor-pointer overflow-hidden mb-gutter">
+<input class="absolute inset-0 opacity-0 cursor-pointer z-10" id="photo-upload" multiple="" type="file"/>
+<div class="text-center p-gutter">
+<div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-stack-md group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary">upload_file</span>
+</div>
+<p class="font-label-caps text-label-caps text-primary mb-stack-sm">SUBIR FOTOS</p>
+<p class="text-[10px] text-on-surface-variant">PNG, JPG hasta 10MB</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-stack-md" id="preview-container">
+<div class="aspect-square bg-surface-container rounded-lg relative group overflow-hidden border border-outline-variant">
+<img class="object-cover w-full h-full opacity-60" data-alt="A clean, professional wide-angle interior shot of a luxury modern apartment living room with large windows, minimalist furniture, and soft daylight. The aesthetic is corporate and high-end, featuring a neutral palette with navy accents to match the PropWealth design system. High resolution architectural photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuNiCAXmSkJgu6JxCPB2hHgK60jg_8G2oW2vflujo5M34OsxV-RjJzWd4n3tGt2d9Xi132nDb--9149YYu5dNu5vaUAEwHZl2XS9piM5jKJRTI1rjvosWNtpbod36zNBr6BwUL_ZIaiuZ6PBeJpT1t5WL7Jvm6nnoZaykUb75fvKGaO-lNsjQTNgMD8GaabG2EPicLZdC6p079S0yJ16HmJcrdZfvG78X5hu7tiiGGD4VEhiavvga2rg"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="text-[10px] font-bold text-on-surface-variant">EJEMPLO 1</span>
+</div>
+</div>
+<div class="aspect-square bg-surface-container rounded-lg relative group overflow-hidden border border-outline-variant">
+<img class="object-cover w-full h-full opacity-60" data-alt="A sharp exterior photo of a contemporary residential building at dusk. Warm architectural lighting illuminates the sleek glass and steel facade against a deep blue sky. The image conveys financial security and property value in a clean, modern aesthetic consistent with executive financial dashboards." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKmZVCc3zCjDgffUDyQd0U3sI4i7JyBDizaJESV2a64SCK-klxvyAOZvBGDxsUUX6sI5o5wySYP2YCMiu5Ne3dts1Rf3x9_k1c-Uke29vPangkdyz6H44XClMMud5jf4TNTHTKjudlqdyy3bYRM0ANklYVxz7oA-OjH2T8ialSbLqBkA1PWSHWH_xf1nuEEGqIuT0fQozFl7F-BKBNJfx3ROYEEIsaGudhjXbPXCXkrZ1dUQlAVyRcrA"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="text-[10px] font-bold text-on-surface-variant">EJEMPLO 2</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-gutter pt-gutter border-t border-outline-variant">
+<p class="font-body-md text-[11px] leading-relaxed text-on-surface-variant italic">
+                            * Las fotos de alta calidad aumentan la velocidad de renta en un 40% según nuestras estadísticas.
+                        </p>
+</div>
+</section>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Viewports Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-center px-gutter py-stack-md bg-primary border-t border-outline-variant shadow-sm">
+<div class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container transition-all p-2 rounded-lg">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-secondary-fixed dark:text-secondary font-bold hover:bg-primary-container transition-all p-2 rounded-lg">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">domain</span>
+<span class="font-label-caps text-label-caps">Properties</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container transition-all p-2 rounded-lg">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-label-caps">Payments</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container transition-all p-2 rounded-lg">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</div>
+</nav>
+<script>
+        // Simple Interaction logic
+        document.getElementById('photo-upload').addEventListener('change', function(e) {
+            // Visual feedback for interaction
+            const preview = document.getElementById('preview-container');
+            const files = e.target.files;
+            
+            if(files.length > 0) {
+                // Mock adding a file feedback
+                console.log(files.length + ' files selected');
+            }
+        });
+
+        // Language toggle micro-interaction
+        const langButtons = document.querySelectorAll('.md\\:flex button');
+        langButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                langButtons.forEach(b => b.classList.remove('bg-primary', 'text-on-primary'));
+                langButtons.forEach(b => b.classList.add('text-on-surface-variant'));
+                btn.classList.remove('text-on-surface-variant');
+                btn.classList.add('bg-primary', 'text-on-primary');
+            });
+        });
+    </script>
+</body></html>

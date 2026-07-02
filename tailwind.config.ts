@@ -1,0 +1,56 @@
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#031632',
+        'on-primary': '#ffffff',
+        'primary-container': '#1a2b48',
+        'on-primary-container': '#8293b5',
+        secondary: '#006e25',
+        'on-secondary': '#ffffff',
+        'secondary-container': '#80f98b',
+        'on-secondary-container': '#007327',
+        tertiary: '#241300',
+        'tertiary-container': '#402500',
+        'on-tertiary-container': '#cd8100',
+        'tertiary-fixed': '#ffddb9',
+        'tertiary-fixed-dim': '#ffb961',
+        'on-tertiary-fixed-variant': '#663e00',
+        error: '#ba1a1a',
+        'error-container': '#ffdad6',
+        'on-error-container': '#93000a',
+        background: '#f8f9fa',
+        'on-background': '#191c1d',
+        surface: '#f8f9fa',
+        'on-surface': '#191c1d',
+        'on-surface-variant': '#44474d',
+        'surface-container-lowest': '#ffffff',
+        'surface-container-low': '#f3f4f5',
+        'surface-container': '#edeeef',
+        'surface-container-high': '#e7e8e9',
+        'surface-container-highest': '#e1e3e4',
+        outline: '#75777e',
+        'outline-variant': '#c5c6ce',
+        'primary-fixed': '#d7e2ff',
+        'primary-fixed-dim': '#b6c7eb',
+        'on-primary-fixed': '#081b38',
+        'on-primary-fixed-variant': '#374765',
+        'secondary-fixed': '#83fc8e',
+        'secondary-fixed-dim': '#66df75',
+        'on-secondary-fixed': '#002106',
+        'inverse-primary': '#b6c7eb',
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
+}
+export default config

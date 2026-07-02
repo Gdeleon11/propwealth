@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PropWealth | Property Inventory</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#241300",
+                        "outline-variant": "#c5c6ce",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#374765",
+                        "primary": "#031632",
+                        "tertiary-fixed": "#ffddb9",
+                        "tertiary-container": "#402500",
+                        "surface-dim": "#d9dadb",
+                        "outline": "#75777e",
+                        "on-secondary-fixed-variant": "#00531a",
+                        "on-tertiary-fixed-variant": "#663e00",
+                        "on-primary-fixed": "#081b38",
+                        "on-secondary-container": "#007327",
+                        "secondary-fixed": "#83fc8e",
+                        "on-primary": "#ffffff",
+                        "background": "#f8f9fa",
+                        "surface-container-high": "#e7e8e9",
+                        "on-surface-variant": "#44474d",
+                        "primary-fixed": "#d7e2ff",
+                        "on-surface": "#191c1d",
+                        "on-background": "#191c1d",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f3f4f5",
+                        "on-secondary-fixed": "#002106",
+                        "tertiary-fixed-dim": "#ffb961",
+                        "surface-tint": "#4e5f7e",
+                        "inverse-on-surface": "#f0f1f2",
+                        "secondary-fixed-dim": "#66df75",
+                        "primary-container": "#1a2b48",
+                        "primary-fixed-dim": "#b6c7eb",
+                        "inverse-primary": "#b6c7eb",
+                        "on-primary-container": "#8293b5",
+                        "surface-container-highest": "#e1e3e4",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#cd8100",
+                        "surface": "#f8f9fa",
+                        "inverse-surface": "#2e3132",
+                        "surface-variant": "#e1e3e4",
+                        "on-tertiary-fixed": "#2b1700",
+                        "secondary-container": "#80f98b",
+                        "surface-bright": "#f8f9fa",
+                        "surface-container": "#edeeef",
+                        "on-error": "#ffffff",
+                        "secondary": "#006e25",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "stack-lg": "24px",
+                        "container-padding": "24px",
+                        "base": "8px",
+                        "stack-md": "12px",
+                        "stack-sm": "4px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "stat-xl": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "data-mono": ["Inter"],
+                        "headline-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "stat-xl": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid #E9ECEF;
+            box-shadow: 0 2px 8px rgba(3, 22, 50, 0.04);
+        }
+        .search-container:focus-within {
+            border-color: #031632;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface dark:bg-surface-container-low border-b border-outline-variant dark:border-outline">
+<div class="max-w-7xl mx-auto flex justify-between items-center px-container-padding py-base">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a corporate executive for a property management platform. The individual has a confident, neutral expression, wearing a tailored navy suit. The lighting is crisp and studio-quality, with a soft grey background that emphasizes the sleek, modern financial services aesthetic of the PropWealth brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrhhL7CdcS4vLsoBwXWROCZz4SpnRJxWsMjnOlIjGKU5vGVWoDIXO00LjQ0GDe0lPmyTsWTBlqSS0zp2OHUTCUBRIzYK6TdASLOXp7WRTWQ-vXw02p3lphdSgmcQ02rrx8EmEwrYd7SrqFATjeBLzPzDctURYsLyMQzs8Y8OLfbvEhnfiwknjguNwI3UEy0bGUugGGY1sZbbpDMYpGS1ztrxq88W-tSzZJGjDL99NVvZTAY_cBv_6TGw"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">PropWealth</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:opacity-80 active:scale-95">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-container-padding max-w-7xl mx-auto min-h-screen">
+<!-- Search and Filter Section -->
+<section class="mb-stack-lg">
+<div class="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+<div class="relative flex-grow search-container border border-outline-variant rounded-xl bg-white transition-all overflow-hidden">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full py-3 pl-12 pr-4 border-none focus:ring-0 text-body-md bg-transparent" placeholder="Search property, address or owner..." type="text"/>
+</div>
+<button class="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-outline-variant rounded-xl hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-primary">tune</span>
+<span class="font-label-caps text-label-caps text-primary">ADVANCED FILTERS</span>
+</button>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
+<button class="px-5 py-2 rounded-full bg-primary text-on-primary font-label-caps text-label-caps whitespace-nowrap">All</button>
+<button class="px-5 py-2 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-low transition-colors whitespace-nowrap">Rented</button>
+<button class="px-5 py-2 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-low transition-colors whitespace-nowrap">Available</button>
+<button class="px-5 py-2 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-caps text-label-caps hover:bg-surface-container-low transition-colors whitespace-nowrap">Maintenance</button>
+</div>
+</section>
+<!-- Property Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Property Card 1 -->
+<div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-all duration-300">
+<div class="h-56 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A luxurious high-rise skyline apartment with massive floor-to-ceiling windows showing a twilight city view. The interior is decorated with minimalist white furniture, oak wood flooring, and warm ambient lighting. The atmosphere is sophisticated and high-end, fitting a corporate real estate investment portfolio, with a clean and bright aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN1BgAK_yAFFe0r4r2sZSjB--p1ZFWrf3OJcy23n7gqi-fxHG4vGB6vZTE1IvFaSM1RTyWmjdD31ZL5jS6gzOGLt72Ph0zHw_W_mEVZw3NPMntF736WpOmR9Nj50jGTMOxBEhELt2nYuiV5pi2QhNlJgBcyunU0ZEkPUgceVhW_IVmX4c9aAkgIL35ntmb_BTGEqO00KKjxNOMcPCLkH37hfUT_bg0nTIQg-IiALeLCVTWfrL7UKFspw"/>
+<div class="absolute top-4 right-4">
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps uppercase shadow-sm">Rented</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">Skyline Loft 402</h3>
+<div class="text-right">
+<span class="block font-label-caps text-label-caps text-outline uppercase">Monthly Rent</span>
+<span class="block font-stat-xl text-stat-xl text-primary">$2,100</span>
+</div>
+</div>
+<p class="text-body-md text-on-surface-variant mb-6">1245 Fifth Ave, New York, NY</p>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Occupancy</span>
+<div class="flex items-center gap-2">
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 100%"></div>
+</div>
+<span class="font-data-mono text-data-mono text-primary">100%</span>
+</div>
+</div>
+<div class="flex justify-between">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">ROI</span>
+<span class="font-data-mono text-data-mono text-secondary font-bold">8.2%</span>
+</div>
+<div class="text-right">
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Cash Flow</span>
+<span class="font-data-mono text-data-mono text-primary font-bold">$1,400</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Property Card 2 -->
+<div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-all duration-300">
+<div class="h-56 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A modern suburban family house with sleek architectural lines, stone accents, and a perfectly manicured front lawn. The lighting is bright mid-day sun, creating high contrast and crisp shadows. The visual style is premium real estate photography, emphasizing stability and value, with a corporate-modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuANGh1A3N52AFgxtakTAMuipLEnt_Dc8sFfGG1xdnnQuzDkKhGW-hL3PC20u9xm7-NK-RS2dJaw3V-Z6PRSzANXH6_0IKw_xzD9Lc32LWg-MSflD3Jmh8AVkBa99aJDdZLNawoaGNwe_DbyYchwZj5GLYN5LotSeZl4Xxa8LBBADnAOSkFETwbckFkVh6VDrhYAGUT9pdurAAXz4lB9Ko0TT24xkN0QDboKD8cquZEyBjydUpfOniHx1A"/>
+<div class="absolute top-4 right-4">
+<span class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-caps text-label-caps uppercase shadow-sm">Available</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">Oakwood Estates</h3>
+<div class="text-right">
+<span class="block font-label-caps text-label-caps text-outline uppercase">Target Rent</span>
+<span class="block font-stat-xl text-stat-xl text-primary">$3,450</span>
+</div>
+</div>
+<p class="text-body-md text-on-surface-variant mb-6">722 Oak Lane, Greenwich, CT</p>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Occupancy</span>
+<div class="flex items-center gap-2">
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-error h-full" style="width: 0%"></div>
+</div>
+<span class="font-data-mono text-data-mono text-primary">0%</span>
+</div>
+</div>
+<div class="flex justify-between">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">ROI</span>
+<span class="font-data-mono text-data-mono text-secondary font-bold">6.8%</span>
+</div>
+<div class="text-right">
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Cash Flow</span>
+<span class="font-data-mono text-data-mono text-primary font-bold">$0</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Property Card 3 -->
+<div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-all duration-300">
+<div class="h-56 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A chic industrial loft apartment with exposed brick walls, steel beams, and large factory-style windows. The space is used as a high-end creative studio or living space. Soft morning light enters through the windows, creating a calm, productive mood. The aesthetic is modern-corporate and sophisticated." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbQra04Nwc4df0SeIWQUKKsC3TCyqvtdPV38h8EF4FyM2oX4EADN4FNx0ZrxGA4b7m5peMJwxkLm6HJFhNcmE-qjDc1Ayg5zZc4EAwphNN2cTt0471aQtDopef3WWwHOxHJ3C0TvaP4Je-Ip3v1O_tt3-JDIWx_On9inzzRWniDWAqNeExyyeACL-2qk7_60FuIh6oAvwIYTQ_3A1DxAYFmQzB175_bF8f2RquxBvmd3J3ZSpGiu6Ekg"/>
+<div class="absolute top-4 right-4">
+<span class="px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-caps text-label-caps uppercase shadow-sm">Maintenance</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">Harborview Loft</h3>
+<div class="text-right">
+<span class="block font-label-caps text-label-caps text-outline uppercase">Monthly Rent</span>
+<span class="block font-stat-xl text-stat-xl text-primary">$1,850</span>
+</div>
+</div>
+<p class="text-body-md text-on-surface-variant mb-6">21 Waterfront Way, Boston, MA</p>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Occupancy</span>
+<div class="flex items-center gap-2">
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 100%"></div>
+</div>
+<span class="font-data-mono text-data-mono text-primary">100%</span>
+</div>
+</div>
+<div class="flex justify-between">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">ROI</span>
+<span class="font-data-mono text-data-mono text-secondary font-bold">7.4%</span>
+</div>
+<div class="text-right">
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Cash Flow</span>
+<span class="font-data-mono text-data-mono text-primary font-bold">$950</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Property Card 4 -->
+<div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-all duration-300">
+<div class="h-56 relative overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="An ultra-modern minimalist penthouse featuring a private rooftop terrace and a small glass-walled pool. The design uses sharp geometric shapes and a monochromatic palette of whites and charcoals. The lighting is golden hour, casting long, elegant shadows. The visual represents peak luxury real estate investment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5wZVF8mwW510FofWClXo1f5znBt7L96nqbXd4pZCLT0wyzpGULruZlYsBv0ugFq4nHdoCkPYHT_KfPI6g0GlGzNasg5wLY8BLAjsfouWrl2qM7PO6ccjt8Bl5W2RzF9ukg4gTZcEZ2ls_ilOgKcA0Ro2-sPaiU-AiegKzEgFalgjJzwaw7-B78pynUv5wagz_msGe0nUjCvBcK6DmcObzokdG3LusdfR4wCUDaR-yU_d_edfteaf4vw"/>
+<div class="absolute top-4 right-4">
+<span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps uppercase shadow-sm">Rented</span>
+</div>
+</div>
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">The Apex Penthouse</h3>
+<div class="text-right">
+<span class="block font-label-caps text-label-caps text-outline uppercase">Monthly Rent</span>
+<span class="block font-stat-xl text-stat-xl text-primary">$8,500</span>
+</div>
+</div>
+<p class="text-body-md text-on-surface-variant mb-6">1 Central Park South, NY</p>
+<div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Occupancy</span>
+<div class="flex items-center gap-2">
+<div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-secondary h-full" style="width: 100%"></div>
+</div>
+<span class="font-data-mono text-data-mono text-primary">100%</span>
+</div>
+</div>
+<div class="flex justify-between">
+<div>
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">ROI</span>
+<span class="font-data-mono text-data-mono text-secondary font-bold">12.5%</span>
+</div>
+<div class="text-right">
+<span class="block font-label-caps text-label-caps text-outline uppercase mb-1">Cash Flow</span>
+<span class="font-data-mono text-data-mono text-primary font-bold">$5,200</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90 z-40">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-primary dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline shadow-sm flex justify-around items-center px-gutter py-stack-md">
+<a class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps uppercase mt-1">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary-fixed dark:text-secondary font-bold hover:bg-primary-container dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">domain</span>
+<span class="font-label-caps text-label-caps uppercase mt-1">Properties</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-caps text-label-caps uppercase mt-1">Payments</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps uppercase mt-1">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps uppercase mt-1">Settings</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions for chips
+        const chips = document.querySelectorAll('.flex.gap-2.overflow-x-auto button');
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                chips.forEach(c => {
+                    c.classList.remove('bg-primary', 'text-on-primary');
+                    c.classList.add('bg-white', 'text-on-surface-variant', 'border', 'border-outline-variant');
+                });
+                chip.classList.add('bg-primary', 'text-on-primary');
+                chip.classList.remove('bg-white', 'text-on-surface-variant', 'border', 'border-outline-variant');
+            });
+        });
+    </script>
+</body></html>

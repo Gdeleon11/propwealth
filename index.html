@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html class="light" lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PropWealth | Executive Asset Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#031632","on-primary": "#ffffff","primary-container": "#1a2b48","on-primary-container": "#8293b5",
+        "secondary": "#006e25","on-secondary": "#ffffff","secondary-container": "#80f98b","on-secondary-container": "#007327",
+        "tertiary": "#241300","on-tertiary": "#ffffff","tertiary-container": "#402500","on-tertiary-container": "#cd8100",
+        "tertiary-fixed": "#ffddb9","tertiary-fixed-dim": "#ffb961","on-tertiary-fixed": "#2b1700","on-tertiary-fixed-variant": "#663e00",
+        "error": "#ba1a1a","on-error": "#ffffff","error-container": "#ffdad6","on-error-container": "#93000a",
+        "background": "#f8f9fa","on-background": "#191c1d",
+        "surface": "#f8f9fa","on-surface": "#191c1d","surface-variant": "#e1e3e4","on-surface-variant": "#44474d",
+        "surface-container-lowest": "#ffffff","surface-container-low": "#f3f4f5","surface-container": "#edeeef",
+        "surface-container-high": "#e7e8e9","surface-container-highest": "#e1e3e4","surface-bright": "#f8f9fa","surface-dim": "#d9dadb",
+        "outline": "#75777e","outline-variant": "#c5c6ce",
+        "primary-fixed": "#d7e2ff","primary-fixed-dim": "#b6c7eb","on-primary-fixed": "#081b38","on-primary-fixed-variant": "#374765",
+        "secondary-fixed": "#83fc8e","secondary-fixed-dim": "#66df75","on-secondary-fixed": "#002106","on-secondary-fixed-variant": "#00531a",
+        "inverse-primary": "#b6c7eb","inverse-surface": "#2e3132","inverse-on-surface": "#f0f1f2","surface-tint": "#4e5f7e"
+      },
+      borderRadius: { "DEFAULT": "0.125rem","lg": "0.25rem","xl": "0.5rem","full": "0.75rem" },
+      spacing: { "base": "8px","stack-sm": "4px","stack-md": "12px","stack-lg": "24px","gutter": "16px","container-padding": "24px" },
+      fontFamily: { "sans": ["Inter","sans-serif"] },
+      fontSize: {
+        "display-lg": ["48px",{"lineHeight":"56px","letterSpacing":"-0.02em","fontWeight":"700"}],
+        "headline-lg": ["32px",{"lineHeight":"40px","letterSpacing":"-0.01em","fontWeight":"600"}],
+        "headline-lg-mobile": ["24px",{"lineHeight":"32px","fontWeight":"600"}],
+        "stat-xl": ["28px",{"lineHeight":"34px","letterSpacing":"-0.01em","fontWeight":"700"}],
+        "body-md": ["16px",{"lineHeight":"24px","fontWeight":"400"}],
+        "label-caps": ["12px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"600"}],
+        "data-mono": ["14px",{"lineHeight":"20px","fontWeight":"500"}]
+      }
+    }
+  }
+}
+</script>
+<style>
+  body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; vertical-align: middle; }
+  .card-shadow { box-shadow: 0 2px 8px rgba(3,22,50,0.04); }
+  .glass-card { background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border: 1px solid #E9ECEF; box-shadow: 0 2px 8px rgba(3,22,50,0.04); }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .chart-bar { transition: height 0.8s cubic-bezier(0.4,0,0.2,1); }
+  .nav-item { cursor: pointer; }
+  body { min-height: 100dvh; }
+  .pill-status { display:inline-flex; align-items:center; padding:2px 10px; border-radius:9999px; font-size:11px; font-weight:700; text-transform:uppercase; }
+</style>
+</head>
+<body class="bg-background text-on-background">
+
+<!-- ===== TOP APP BAR ===== -->
+<header class="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant max-w-7xl mx-auto left-0 right-0" style="max-width:100%;">
+  <div class="max-w-7xl mx-auto flex justify-between items-center px-6 py-2">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
+        <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVBGi0X1dH9qvZS8AqkFZalRpMDg5Zdm_z34dLrEIZ4mGMs5SOM8EMEJlcmTP0BiJbIUD4rBgH2DbRhy-v1Y1tabOY-LThrvWKu52m0tFXKo2RJIvB3V3jFe2RwygIny88L1qBeQ8_Nr1QokRghP2K3kezEkO_UQIU0y5CXVJQIqvO5Dkzn-6jMTmn23U70widlG51yC-wrkLp_S-aVMNCq8FodcoKfUh78dw8RKJlaeLwexU0-gZyKg" alt="Avatar"/>
+      </div>
+      <span class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">PropWealth</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="flex items-center bg-surface-container-high rounded-full p-1 gap-1">
+        <button class="px-2 py-1 text-[10px] font-bold rounded-full bg-primary text-white">ES</button>
+        <button class="px-2 py-1 text-[10px] font-bold rounded-full text-on-surface-variant hover:bg-surface-variant">EN</button>
+      </div>
+      <button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high text-primary relative">
+        <span class="material-symbols-outlined">notifications</span>
+        <span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ===== MAIN CONTENT AREA ===== -->
+<div class="pt-16 pb-20">
+
+<!-- ===== SCREEN 1: DASHBOARD ===== -->
+<div id="screen-dashboard" class="screen active px-6 max-w-7xl mx-auto py-4">
+  <section class="mt-2">
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-surface-container-lowest p-4 border border-outline-variant rounded-xl card-shadow">
+        <p class="font-label-caps text-label-caps text-on-surface-variant mb-2">VALOR TOTAL DEL PORTAFOLIO</p>
+        <h2 class="font-stat-xl text-stat-xl text-primary">$4.2M</h2>
+        <div class="mt-3 h-1 w-full bg-primary-fixed overflow-hidden rounded-full"><div class="h-full bg-primary w-[75%]"></div></div>
+      </div>
+      <div class="bg-surface-container-lowest p-4 border border-outline-variant rounded-xl card-shadow">
+        <p class="font-label-caps text-label-caps text-on-surface-variant mb-2">INGRESOS MENSUALES</p>
+        <div class="flex items-end gap-2">
+          <h2 class="font-stat-xl text-stat-xl text-primary">$28,500</h2>
+          <span class="flex items-center text-secondary font-label-caps text-label-caps mb-1"><span class="material-symbols-outlined text-[14px]">arrow_upward</span>4%</span>
+        </div>
+        <div class="mt-3 flex gap-1 items-end h-6">
+          <div class="bg-secondary opacity-20 w-full h-[40%] rounded-sm"></div>
+          <div class="bg-secondary opacity-30 w-full h-[60%] rounded-sm"></div>
+          <div class="bg-secondary opacity-50 w-full h-[45%] rounded-sm"></div>
+          <div class="bg-secondary opacity-70 w-full h-[80%] rounded-sm"></div>
+          <div class="bg-secondary w-full h-[100%] rounded-sm"></div>
+        </div>
+      </div>
+      <div class="bg-surface-container-lowest p-4 border border-outline-variant rounded-xl card-shadow">
+        <p class="font-label-caps text-label-caps text-on-surface-variant mb-2">FLUJO DE CAJA NETO</p>
+        <h2 class="font-stat-xl text-stat-xl text-primary">$18,200</h2>
+        <div class="mt-3 h-6 flex items-center"><span class="text-on-surface-variant text-[10px] font-label-caps">RENDIMIENTO ESTABLE</span></div>
+      </div>
+      <div class="bg-surface-container-lowest p-4 border border-outline-variant rounded-xl card-shadow">
+        <p class="font-label-caps text-label-caps text-on-surface-variant mb-2">ROI GLOBAL</p>
+        <h2 class="font-stat-xl text-stat-xl text-primary">7.8%</h2>
+        <div class="mt-3"><span class="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full text-[10px] font-bold">TOP 5%</span></div>
+      </div>
+    </div>
+  </section>
+  <section class="mt-4">
+    <h3 class="font-label-caps text-label-caps text-on-surface-variant mb-3 flex items-center gap-2">ALERTAS CRÍTICAS <span class="w-1.5 h-1.5 bg-error rounded-full animate-pulse"></span></h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-white border-l-4 border-error p-4 rounded-lg card-shadow flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-error-container rounded-full flex items-center justify-center text-error"><span class="material-symbols-outlined">error</span></div>
+          <div>
+            <p class="font-semibold text-[18px] text-primary">3 Pagos de Renta Vencidos</p>
+            <p class="text-on-surface-variant text-sm mt-0.5">Prioridad Alta • Valor Total: $6,400</p>
+          </div>
+        </div>
+        <button class="text-primary hover:underline font-label-caps text-label-caps">RESOLVER</button>
+      </div>
+      <div class="bg-white border-l-4 border-tertiary-container p-4 rounded-lg card-shadow flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center text-on-tertiary-container"><span class="material-symbols-outlined">build</span></div>
+          <div>
+            <p class="font-semibold text-[18px] text-primary">Mantenimiento Pendiente: Torre A</p>
+            <p class="text-on-surface-variant text-sm mt-0.5">Prioridad Media • Reparación de A/C</p>
+          </div>
+        </div>
+        <button class="text-primary hover:underline font-label-caps text-label-caps">APROBAR</button>
+      </div>
+    </div>
+  </section>
+  <section class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="md:col-span-2 bg-surface-container-lowest border border-outline-variant p-4 rounded-xl card-shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-label-caps text-label-caps text-on-surface-variant">INGRESOS VS GASTOS (ÚLTIMOS 6 MESES)</h3>
+        <div class="flex gap-4">
+          <div class="flex items-center gap-1.5 text-[10px] font-bold"><span class="w-2 h-2 bg-primary rounded-full"></span> INGRESOS</div>
+          <div class="flex items-center gap-1.5 text-[10px] font-bold"><span class="w-2 h-2 bg-outline-variant rounded-full"></span> GASTOS</div>
+        </div>
+      </div>
+      <div class="flex items-end justify-around h-40 gap-4 pt-4">
+        <div class="flex flex-col items-center flex-1 h-full"><div class="w-full flex items-end justify-center gap-1 h-full"><div class="w-1/3 bg-primary rounded-t-sm" style="height:80%"></div><div class="w-1/3 bg-outline-variant rounded-t-sm" style="height:30%"></div></div><span class="mt-2 text-[10px] font-label-caps text-on-surface-variant">JUL</span></div>
+        <div class="flex flex-col items-center flex-1 h-full"><div class="w-full flex items-end justify-center gap-1 h-full"><div class="w-1/3 bg-primary rounded-t-sm" style="height:85%"></div><div class="w-1/3 bg-outline-variant rounded-t-sm" style="height:35%"></div></div><span class="mt-2 text-[10px] font-label-caps text-on-surface-variant">AGO</span></div>
+        <div class="flex flex-col items-center flex-1 h-full"><div class="w-full flex items-end justify-center gap-1 h-full"><div class="w-1/3 bg-primary rounded-t-sm" style="height:75%"></div><div class="w-1/3 bg-outline-variant rounded-t-sm" style="height:40%"></div></div><span class="mt-2 text-[10px] font-label-caps text-on-surface-variant">SEP</span></div>
+        <div class="flex flex-col items-center flex-1 h-full"><div class="w-full flex items-end justify-center gap-1 h-full"><div class="w-1/3 bg-primary rounded-t-sm" style="height:90%"></div><div class="w-1/3 bg-outline-variant rounded-t-sm" style="height:30%"></div></div><span class="mt-2 text-[10px] font-label-caps text-on-surface-variant">OCT</span></div>
+        <div class="flex flex-col items-center flex-1 h-full"><div class="w-full flex items-end justify-center gap-1 h-full"><div class="w-1/3 bg-primary rounded-t-sm" style="height:82%"></div><div class="w-1/3 bg-outline-variant rounded-t-sm" style="height:38%"></div></div><span class="mt-2 text-[10px] font-label-caps text-on-surface-variant">NOV</span></div>
+        <div class="flex flex-col items-center flex-1 h-full"><div class="w-full flex items-end justify-center gap-1 h-full"><div class="w-1/3 bg-primary rounded-t-sm" style="height:95%"></div><div class="w-1/3 bg-outline-variant rounded-t-sm" style="height:45%"></div></div><span class="mt-2 text-[10px] font-label-caps text-on-surface-variant">DIC</span></div>
+      </div>
+    </div>
+    <div class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl card-shadow">
+      <h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4">PAGOS RECIENTES</h3>
+      <div class="space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-surface-variant"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container"><span class="material-symbols-outlined text-[16px]">check</span></div><div><p class="text-sm font-bold text-primary">Apt 402 • Skyline</p><p class="text-[10px] text-on-surface-variant">Hoy, 10:45 AM</p></div></div><p class="text-sm font-bold text-secondary">+$2,450</p></div>
+        <div class="flex items-center justify-between pb-3 border-b border-surface-variant"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container"><span class="material-symbols-outlined text-[16px]">check</span></div><div><p class="text-sm font-bold text-primary">Unidad 12 • Riverside</p><p class="text-[10px] text-on-surface-variant">Ayer, 4:20 PM</p></div></div><p class="text-sm font-bold text-secondary">+$1,800</p></div>
+        <div class="flex items-center justify-between pb-3"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container"><span class="material-symbols-outlined text-[16px]">check</span></div><div><p class="text-sm font-bold text-primary">Suite A • Business Hub</p><p class="text-[10px] text-on-surface-variant">Ayer, 9:15 AM</p></div></div><p class="text-sm font-bold text-secondary">+$4,200</p></div>
+      </div>
+      <button class="w-full mt-3 py-2 text-primary border border-primary font-label-caps text-label-caps hover:bg-primary hover:text-white transition-all rounded">VER TODA LA ACTIVIDAD</button>
+    </div>
+  </section>
+  <section class="mt-4 relative overflow-hidden rounded-xl h-44 border border-outline-variant bg-primary-container mb-4">
+    <div class="absolute inset-0 opacity-10 pointer-events-none"><div class="absolute top-0 left-0 w-full h-full" style="background-image:radial-gradient(#ffffff 1px,transparent 0);background-size:24px 24px;"></div></div>
+    <div class="relative z-10 p-6 flex flex-col h-full justify-center text-white">
+      <span class="bg-secondary px-3 py-1 rounded-full text-[10px] font-bold w-fit mb-3">POTENCIADO POR IA</span>
+      <h2 class="font-headline-lg-mobile text-headline-lg-mobile">Maximiza la Eficiencia de tu Portafolio</h2>
+      <p class="text-on-primary-container max-w-md mt-2 text-sm">Análisis predictivo sugiere un aumento potencial del 1.2% en el ROI al ajustar los términos de arrendamiento en la Torre B.</p>
+    </div>
+    <div class="absolute right-[-5%] bottom-[-20%] w-64 h-64 opacity-20"><span class="material-symbols-outlined text-[120px]">trending_up</span></div>
+  </section>
+</div>
+
+<!-- ===== SCREEN 2: PROPIEDADES ===== -->
+<div id="screen-properties" class="screen px-6 max-w-7xl mx-auto py-4">
+  <section class="mb-4">
+    <div class="flex flex-col md:flex-row md:items-center gap-4 mb-4">
+      <div class="relative flex-grow border border-outline-variant rounded-xl bg-white overflow-hidden">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+        <input class="w-full py-3 pl-12 pr-4 border-none focus:ring-0 text-body-md bg-transparent" placeholder="Buscar propiedad, dirección o propietario..." type="text"/>
+      </div>
+      <button class="flex items-center justify-center gap-2 px-6 py-3 bg-white border border-outline-variant rounded-xl hover:bg-surface-container-low">
+        <span class="material-symbols-outlined text-primary">tune</span>
+        <span class="font-label-caps text-label-caps text-primary">FILTROS</span>
+      </button>
+    </div>
+    <div class="flex gap-2 overflow-x-auto pb-2 hide-scrollbar">
+      <button class="px-5 py-2 rounded-full bg-primary text-on-primary font-label-caps text-label-caps whitespace-nowrap">Todos</button>
+      <button class="px-5 py-2 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap">Rentados</button>
+      <button class="px-5 py-2 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap">Disponibles</button>
+      <button class="px-5 py-2 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap">Mantenimiento</button>
+    </div>
+  </section>
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Property Card 1 -->
+    <div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-all cursor-pointer" onclick="showScreen('screen-property-detail')">
+      <div class="h-52 relative overflow-hidden">
+        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN1BgAK_yAFFe0r4r2sZSjB--p1ZFWrf3OJcy23n7gqi-fxHG4vGB6vZTE1IvFaSM1RTyWmjdD31ZL5jS6gzOGLt72Ph0zHw_W_mEVZw3NPMntF736WpOmR9Nj50jGTMOxBEhELt2nYuiV5pi2QhNlJgBcyunU0ZEkPUgceVhW_IVmX4c9aAkgIL35ntmb_BTGEqO00KKjxNOMcPCLkH37hfUT_bg0nTIQg-IiALeLCVTWfrL7UKFspw" alt="Skyline Loft"/>
+        <div class="absolute top-3 right-3"><span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps">Rentado</span></div>
+      </div>
+      <div class="p-5">
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">Skyline Loft 402</h3>
+          <div class="text-right"><span class="block font-label-caps text-label-caps text-outline">Renta Mensual</span><span class="block font-stat-xl text-stat-xl text-primary">$2,100</span></div>
+        </div>
+        <p class="text-body-md text-on-surface-variant mb-4">1245 Fifth Ave, New York, NY</p>
+        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant">
+          <div><span class="block font-label-caps text-label-caps text-outline mb-1">Ocupación</span><div class="flex items-center gap-2"><div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden"><div class="bg-secondary h-full" style="width:100%"></div></div><span class="font-data-mono text-data-mono text-primary">100%</span></div></div>
+          <div class="flex justify-between"><div><span class="block font-label-caps text-label-caps text-outline mb-1">ROI</span><span class="font-data-mono text-data-mono text-secondary font-bold">8.2%</span></div><div class="text-right"><span class="block font-label-caps text-label-caps text-outline mb-1">Flujo</span><span class="font-data-mono text-data-mono text-primary font-bold">$1,400</span></div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Property Card 2 -->
+    <div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-all cursor-pointer">
+      <div class="h-52 relative overflow-hidden">
+        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANGh1A3N52AFgxtakTAMuipLEnt_Dc8sFfGG1xdnnQuzDkKhGW-hL3PC20u9xm7-NK-RS2dJaw3V-Z6PRSzANXH6_0IKw_xzD9Lc32LWg-MSflD3Jmh8AVkBa99aJDdZLNawoaGNwe_DbyYchwZj5GLYN5LotSeZl4Xxa8LBBADnAOSkFETwbckFkVh6VDrhYAGUT9pdurAAXz4lB9Ko0TT24xkN0QDboKD8cquZEyBjydUpfOniHx1A" alt="Oakwood Estates"/>
+        <div class="absolute top-3 right-3"><span class="px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-caps text-label-caps">Disponible</span></div>
+      </div>
+      <div class="p-5">
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">Oakwood Estates</h3>
+          <div class="text-right"><span class="block font-label-caps text-label-caps text-outline">Renta Objetivo</span><span class="block font-stat-xl text-stat-xl text-primary">$3,450</span></div>
+        </div>
+        <p class="text-body-md text-on-surface-variant mb-4">722 Oak Lane, Greenwich, CT</p>
+        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant">
+          <div><span class="block font-label-caps text-label-caps text-outline mb-1">Ocupación</span><div class="flex items-center gap-2"><div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden"><div class="bg-error h-full" style="width:0%"></div></div><span class="font-data-mono text-data-mono text-primary">0%</span></div></div>
+          <div class="flex justify-between"><div><span class="block font-label-caps text-label-caps text-outline mb-1">ROI</span><span class="font-data-mono text-data-mono text-secondary font-bold">6.8%</span></div><div class="text-right"><span class="block font-label-caps text-label-caps text-outline mb-1">Flujo</span><span class="font-data-mono text-data-mono text-primary font-bold">$0</span></div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Property Card 3 -->
+    <div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-all cursor-pointer">
+      <div class="h-52 relative overflow-hidden">
+        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbQra04Nwc4df0SeIWQUKKsC3TCyqvtdPV38h8EF4FyM2oX4EADN4FNx0ZrxGA4b7m5peMJwxkLm6HJFhNcmE-qjDc1Ayg5zZc4EAwphNN2cTt0471aQtDopef3WWwHOxHJ3C0TvaP4Je-Ip3v1O_tt3-JDIWx_On9inzzRWniDWAqNeExyyeACL-2qk7_60FuIh6oAvwIYTQ_3A1DxAYFmQzB175_bF8f2RquxBvmd3J3ZSpGiu6Ekg" alt="Harborview Loft"/>
+        <div class="absolute top-3 right-3"><span class="px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label-caps text-label-caps">Mantenimiento</span></div>
+      </div>
+      <div class="p-5">
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">Harborview Loft</h3>
+          <div class="text-right"><span class="block font-label-caps text-label-caps text-outline">Renta Mensual</span><span class="block font-stat-xl text-stat-xl text-primary">$1,850</span></div>
+        </div>
+        <p class="text-body-md text-on-surface-variant mb-4">21 Waterfront Way, Boston, MA</p>
+        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant">
+          <div><span class="block font-label-caps text-label-caps text-outline mb-1">Ocupación</span><div class="flex items-center gap-2"><div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden"><div class="bg-secondary h-full" style="width:100%"></div></div><span class="font-data-mono text-data-mono text-primary">100%</span></div></div>
+          <div class="flex justify-between"><div><span class="block font-label-caps text-label-caps text-outline mb-1">ROI</span><span class="font-data-mono text-data-mono text-secondary font-bold">7.4%</span></div><div class="text-right"><span class="block font-label-caps text-label-caps text-outline mb-1">Flujo</span><span class="font-data-mono text-data-mono text-primary font-bold">$950</span></div></div>
+        </div>
+      </div>
+    </div>
+    <!-- Property Card 4 -->
+    <div class="glass-card rounded-xl overflow-hidden group hover:shadow-lg transition-all cursor-pointer">
+      <div class="h-52 relative overflow-hidden">
+        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5wZVF8mwW510FofWClXo1f5znBt7L96nqbXd4pZCLT0wyzpGULruZlYsBv0ugFq4nHdoCkPYHT_KfPI6g0GlGzNasg5wLY8BLAjsfouWrl2qM7PO6ccjt8Bl5W2RzF9ukg4gTZcEZ2ls_ilOgKcA0Ro2-sPaiU-AiegKzEgFalgjJzwaw7-B78pynUv5wagz_msGe0nUjCvBcK6DmcObzokdG3LusdfR4wCUDaR-yU_d_edfteaf4vw" alt="The Apex Penthouse"/>
+        <div class="absolute top-3 right-3"><span class="px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container font-label-caps text-label-caps">Rentado</span></div>
+      </div>
+      <div class="p-5">
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="font-headline-lg-mobile text-headline-lg-mobile text-primary font-bold">The Apex Penthouse</h3>
+          <div class="text-right"><span class="block font-label-caps text-label-caps text-outline">Renta Mensual</span><span class="block font-stat-xl text-stat-xl text-primary">$8,500</span></div>
+        </div>
+        <p class="text-body-md text-on-surface-variant mb-4">1 Central Park South, NY</p>
+        <div class="grid grid-cols-2 gap-4 pt-4 border-t border-outline-variant">
+          <div><span class="block font-label-caps text-label-caps text-outline mb-1">Ocupación</span><div class="flex items-center gap-2"><div class="w-full bg-surface-container-high h-2 rounded-full overflow-hidden"><div class="bg-secondary h-full" style="width:100%"></div></div><span class="font-data-mono text-data-mono text-primary">100%</span></div></div>
+          <div class="flex justify-between"><div><span class="block font-label-caps text-label-caps text-outline mb-1">ROI</span><span class="font-data-mono text-data-mono text-secondary font-bold">12.5%</span></div><div class="text-right"><span class="block font-label-caps text-label-caps text-outline mb-1">Flujo</span><span class="font-data-mono text-data-mono text-primary font-bold">$5,200</span></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- FAB -->
+  <button onclick="showScreen('screen-add-property')" class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-90 transition-all z-40">
+    <span class="material-symbols-outlined text-3xl">add</span>
+  </button>
+</div>
+
+<!-- ===== SCREEN 3: PROPERTY DETAIL ===== -->
+<div id="screen-property-detail" class="screen px-6 max-w-7xl mx-auto py-4">
+  <div class="flex items-center gap-3 mb-4">
+    <button onclick="showScreen('screen-properties')" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high text-primary">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </button>
+    <h2 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Skyline Loft 402</h2>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+    <div class="md:col-span-8 space-y-6">
+      <section class="grid grid-cols-4 grid-rows-2 gap-2 h-[360px] rounded-xl overflow-hidden shadow-sm">
+        <div class="col-span-3 row-span-2 relative group cursor-pointer">
+          <img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPjcrckYAZFhMANTdiAxr6T3AbgbygNbdrWp1AG8iFxiuCFYvBf7CscT77InOKUC8iKA_KqUGFhnWs1ewvuS5ecXpWlipmcQasmC0TZbmDQsYv2BtVCN8HFGhIw_3Q3Q0KiSx0ZTMhr9Mxex_XSZlcb2944jwiIE8F8ckrLN4-pjtxDi9ePXKuuZzvWEmXpfQlvit02Zq6AqKKsNqx1rLYFxP8YkR3oJECM7G_iZXt0xgRTkO3ViLudA" alt="Loft principal"/>
+          <div class="absolute top-4 left-4"><span class="px-3 py-1 bg-secondary text-on-secondary rounded-full font-label-caps text-label-caps shadow-lg">RENTADA</span></div>
+        </div>
+        <div class="col-span-1 row-span-1">
+          <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBg5r72mnW9EC2cvt-bvvQT1-LLFsnjsiS7lP37bh6Eqdu808-4Z8vQHz7jR8QSva9pDf36rfUAVIHysstLjZnsXwKYLkbvQJ8vUjNjvenEQgxLRgPlqfzgWPT4Rlop6oqoGgr-MFpeIuI935V38k_8lWYViYckzFJJk9ZOR60v1Dem6Bc5HPS14sRK64MIqAij3Efynwo6N7H4vEe48_1D0zkMqQNjXY2T9PFMadhHe_jwNTb8dw59HA" alt="Cocina"/>
+        </div>
+        <div class="col-span-1 row-span-1 relative">
+          <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3irOmJF2RO8t74MSnhVXMyPrZ5Xy6vJJ02-B4c7tvIoKS8U6lbtmFhaQKhWGiCUlNzqPBd4WtflnkDFcJXQokfyOrKM0R3qgSCj75OrOgZMmFgPuyw-6OMttUP6KXtubox6ShyPlzZLhUseCdR19KGpguhwLN8_8gylRtlUrNGEKHd1Ftyv-3ZBRkbsOMVa3_UHfuHN33giJlfP-M2lluXwQFST8MzWmPjn6bCW6xoaX67jXaXWRNng" alt="Dormitorio"/>
+          <div class="absolute inset-0 bg-primary/40 flex items-center justify-center cursor-pointer"><span class="text-on-primary font-label-caps text-label-caps">+12 Fotos</span></div>
+        </div>
+      </section>
+      <section class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="glass-card p-4 rounded-xl"><span class="font-label-caps text-label-caps text-on-surface-variant">RENTA MENSUAL</span><div class="flex items-baseline gap-1 mt-2"><span class="font-stat-xl text-stat-xl text-primary">$2,100</span></div><div class="mt-3 h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden"><div class="bg-secondary h-full w-[85%]"></div></div></div>
+        <div class="glass-card p-4 rounded-xl border-l-4 border-l-secondary"><span class="font-label-caps text-label-caps text-on-surface-variant">ROI ANUAL</span><div class="flex items-baseline gap-1 mt-2"><span class="font-stat-xl text-stat-xl text-secondary">8.2%</span></div><p class="text-[10px] font-label-caps text-secondary mt-1">↑ 0.4% vs mes anterior</p></div>
+        <div class="glass-card p-4 rounded-xl"><span class="font-label-caps text-label-caps text-on-surface-variant">FLUJO DE CAJA</span><div class="flex items-baseline gap-1 mt-2"><span class="font-stat-xl text-stat-xl text-primary">$1,400</span></div><p class="text-[10px] font-label-caps text-on-surface-variant mt-1">NETO DESPUÉS DE GASTOS</p></div>
+      </section>
+    </div>
+    <div class="md:col-span-4 space-y-4">
+      <section class="glass-card p-4 rounded-xl">
+        <h3 class="font-label-caps text-label-caps text-primary mb-4 border-b border-outline-variant pb-2">INFORMACIÓN DEL INQUILINO</h3>
+        <div class="flex items-center gap-4 mb-4">
+          <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-primary-container">
+            <img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB01IiZX4kCel2TRp6-wh078udwV3Ikc2o4fz21BaXR1gO-vBFWcG_OGzRDAt_IZEGQfcI6WC5RhIl9IjZG6YX2pJBoa8_3GRuO4h4_jOtVANXcq-UzeQIV0zcshMV6x9kwM_L_HIR3kveObfHjdRapPnYzrPFsA8BdL3RkE5rL4-vtGfVDJWv_UFO-tm5MZqpl-H8m_0eHeTaB0Mi3NHnXRgZXhjbjBEtTjVB0era29gaKXVsNm5JBEQ" alt="Tenant"/>
+          </div>
+          <div><p class="font-body-md font-bold text-primary">Alexander Sterling</p><p class="text-on-surface-variant text-[12px]">Consultor Senior</p></div>
+        </div>
+        <div class="space-y-3 text-[13px]">
+          <div class="flex justify-between"><span class="text-on-surface-variant font-label-caps text-[10px]">CONTRATO DESDE</span><span class="font-medium">15 Ene, 2023</span></div>
+          <div class="flex justify-between"><span class="text-on-surface-variant font-label-caps text-[10px]">EXPIRACIÓN</span><span class="font-medium">14 Ene, 2025</span></div>
+          <div class="mt-4 pt-4 border-t border-outline-variant">
+            <button class="w-full py-2 bg-primary text-on-primary rounded font-label-caps text-label-caps hover:opacity-90 flex items-center justify-center gap-2">
+              <span class="material-symbols-outlined text-sm">mail</span>CONTACTAR
+            </button>
+          </div>
+        </div>
+      </section>
+      <section class="glass-card p-4 rounded-xl bg-tertiary/5 border-l-4 border-l-tertiary-fixed-dim">
+        <div class="flex items-start justify-between mb-2"><h3 class="font-label-caps text-label-caps text-tertiary">PRÓXIMO MANTENIMIENTO</h3><span class="material-symbols-outlined text-tertiary">engineering</span></div>
+        <div class="p-3 bg-white/60 rounded-lg"><p class="font-body-md font-bold text-primary">Revisión de A/C</p><p class="text-[12px] text-on-surface-variant mt-1">Programado: <span class="font-bold">22 Oct, 2023</span></p></div>
+        <button class="mt-3 text-primary font-label-caps text-[10px] flex items-center gap-1 hover:underline">REPROGRAMAR <span class="material-symbols-outlined text-sm">chevron_right</span></button>
+      </section>
+      <section class="glass-card p-4 rounded-xl">
+        <h3 class="font-label-caps text-label-caps text-primary mb-4 border-b border-outline-variant pb-2">DOCUMENTOS</h3>
+        <ul class="space-y-3">
+          <li class="flex items-center justify-between p-2 hover:bg-surface-container rounded cursor-pointer"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-error">picture_as_pdf</span><span class="text-[13px] font-medium">Contrato_Arrendamiento.pdf</span></div><span class="material-symbols-outlined text-on-surface-variant text-sm">download</span></li>
+          <li class="flex items-center justify-between p-2 hover:bg-surface-container rounded cursor-pointer"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-error">picture_as_pdf</span><span class="text-[13px] font-medium">Seguro_Propiedad_2023.pdf</span></div><span class="material-symbols-outlined text-on-surface-variant text-sm">download</span></li>
+          <li class="flex items-center justify-between p-2 hover:bg-surface-container rounded cursor-pointer"><div class="flex items-center gap-3"><span class="material-symbols-outlined text-primary">description</span><span class="text-[13px] font-medium">Reglamento_Copropiedad.docx</span></div><span class="material-symbols-outlined text-on-surface-variant text-sm">download</span></li>
+        </ul>
+        <button class="w-full mt-4 py-2 border-2 border-dashed border-outline-variant text-on-surface-variant rounded font-label-caps text-[10px] hover:border-primary hover:text-primary transition-all">+ SUBIR NUEVO DOCUMENTO</button>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 4: ADD PROPERTY ===== -->
+<div id="screen-add-property" class="screen px-6 max-w-5xl mx-auto py-4">
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+    <div>
+      <nav class="flex items-center gap-2 text-on-surface-variant mb-2">
+        <button onclick="showScreen('screen-properties')" class="font-label-caps text-label-caps hover:text-primary">PROPIEDADES</button>
+        <span class="material-symbols-outlined text-sm">chevron_right</span>
+        <span class="font-label-caps text-label-caps text-primary">NUEVA ENTRADA</span>
+      </nav>
+      <h2 class="font-headline-lg text-headline-lg text-primary">Agregar Nueva Propiedad</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Complete los detalles financieros y estructurales del activo.</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="showScreen('screen-properties')" class="px-4 py-3 border border-outline text-primary rounded-lg font-label-caps text-label-caps hover:bg-surface-container-low">CANCELAR</button>
+      <button class="px-4 py-3 bg-primary text-on-primary rounded-lg font-label-caps text-label-caps hover:opacity-90 shadow-sm flex items-center gap-2"><span class="material-symbols-outlined text-sm">save</span>GUARDAR PROPIEDAD</button>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-8">
+    <div class="lg:col-span-8 space-y-6">
+      <section class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl card-shadow">
+        <div class="flex items-center gap-2 mb-4 border-b border-outline-variant pb-3"><span class="material-symbols-outlined text-primary">info</span><h3 class="font-label-caps text-label-caps text-primary tracking-widest">INFORMACIÓN GENERAL</h3></div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-1 md:col-span-2"><label class="block font-label-caps text-label-caps text-on-surface-variant">NOMBRE DE LA PROPIEDAD</label><input class="w-full bg-surface-bright border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:border-primary transition-colors outline-none" placeholder="Ej: Residencia Los Olivos - Bloque A" type="text"/></div>
+          <div class="space-y-1 md:col-span-2"><label class="block font-label-caps text-label-caps text-on-surface-variant">DIRECCIÓN COMPLETA</label><div class="relative"><span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">location_on</span><input class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-12 pr-4 py-3 font-body-md text-body-md focus:border-primary outline-none" placeholder="Calle, Número, Ciudad, CP" type="text"/></div></div>
+          <div class="space-y-1"><label class="block font-label-caps text-label-caps text-on-surface-variant">TIPO DE PROPIEDAD</label><select class="w-full bg-surface-bright border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:border-primary outline-none"><option>Apartamento</option><option>Casa</option><option>Local Comercial</option><option>Oficina</option><option>Terreno</option></select></div>
+          <div class="space-y-1"><label class="block font-label-caps text-label-caps text-on-surface-variant">ESTADO</label><select class="w-full bg-surface-bright border border-outline-variant rounded-lg px-4 py-3 font-body-md text-body-md focus:border-primary outline-none"><option>Disponible</option><option>Rentado</option><option>Mantenimiento</option></select></div>
+        </div>
+      </section>
+      <section class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl card-shadow">
+        <div class="flex items-center gap-2 mb-4 border-b border-outline-variant pb-3"><span class="material-symbols-outlined text-primary">payments</span><h3 class="font-label-caps text-label-caps text-primary tracking-widest">MÉTRICAS FINANCIERAS</h3></div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="space-y-1"><label class="block font-label-caps text-label-caps text-on-surface-variant">VALOR DE COMPRA</label><div class="relative"><span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-primary">$</span><input class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-8 pr-4 py-3 font-data-mono text-data-mono focus:border-primary outline-none" placeholder="0.00" type="number"/></div></div>
+          <div class="space-y-1"><label class="block font-label-caps text-label-caps text-on-surface-variant">RENTA MENSUAL</label><div class="relative"><span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-secondary">$</span><input class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-8 pr-4 py-3 font-data-mono text-data-mono focus:border-primary outline-none" placeholder="0.00" type="number"/></div></div>
+          <div class="space-y-1"><label class="block font-label-caps text-label-caps text-on-surface-variant">DEPÓSITO</label><div class="relative"><span class="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-on-surface-variant">$</span><input class="w-full bg-surface-bright border border-outline-variant rounded-lg pl-8 pr-4 py-3 font-data-mono text-data-mono focus:border-primary outline-none" placeholder="0.00" type="number"/></div></div>
+        </div>
+        <div class="mt-4 p-2 bg-surface-container rounded-lg border border-outline-variant/30"><div class="flex justify-between items-center px-2"><span class="text-label-caps font-label-caps text-on-surface-variant">RENDIMIENTO ESTIMADO (ROI)</span><span class="font-data-mono text-data-mono text-secondary font-bold">8.4% ANUAL</span></div></div>
+      </section>
+    </div>
+    <div class="lg:col-span-4">
+      <section class="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl card-shadow h-full">
+        <div class="flex items-center gap-2 mb-4 border-b border-outline-variant pb-3"><span class="material-symbols-outlined text-primary">photo_camera</span><h3 class="font-label-caps text-label-caps text-primary tracking-widest">MULTIMEDIA</h3></div>
+        <div class="w-full h-52 border-2 border-dashed border-outline-variant rounded-xl flex flex-col items-center justify-center bg-surface-container-low hover:bg-surface-container-high transition-all cursor-pointer mb-4">
+          <input class="absolute opacity-0 cursor-pointer" type="file" multiple/>
+          <div class="text-center p-4">
+            <div class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3"><span class="material-symbols-outlined text-primary">upload_file</span></div>
+            <p class="font-label-caps text-label-caps text-primary mb-1">SUBIR FOTOS</p>
+            <p class="text-[10px] text-on-surface-variant">PNG, JPG hasta 10MB</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="aspect-square bg-surface-container rounded-lg overflow-hidden border border-outline-variant"><img class="object-cover w-full h-full opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuNiCAXmSkJgu6JxCPB2hHgK60jg_8G2oW2vflujo5M34OsxV-RjJzWd4n3tGt2d9Xi132nDb--9149YYu5dNu5vaUAEwHZl2XS9piM5jKJRTI1rjvosWNtpbod36zNBr6BwUL_ZIaiuZ6PBeJpT1t5WL7Jvm6nnoZaykUb75fvKGaO-lNsjQTNgMD8GaabG2EPicLZdC6p079S0yJ16HmJcrdZfvG78X5hu7tiiGGD4VEhiavvga2rg" alt="Preview 1"/></div>
+          <div class="aspect-square bg-surface-container rounded-lg overflow-hidden border border-outline-variant"><img class="object-cover w-full h-full opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKmZVCc3zCjDgffUDyQd0U3sI4i7JyBDizaJESV2a64SCK-klxvyAOZvBGDxsUUX6sI5o5wySYP2YCMiu5Ne3dts1Rf3x9_k1c-Uke29vPangkdyz6H44XClMMud5jf4TNTHTKjudlqdyy3bYRM0ANklYVxz7oA-OjH2T8ialSbLqBkA1PWSHWH_xf1nuEEGqIuT0fQozFl7F-BKBNJfx3ROYEEIsaGudhjXbPXCXkrZ1dUQlAVyRcrA" alt="Preview 2"/></div>
+        </div>
+        <p class="mt-4 pt-4 border-t border-outline-variant font-body-md text-[11px] leading-relaxed text-on-surface-variant italic">* Las fotos de alta calidad aumentan la velocidad de renta en un 40%.</p>
+      </section>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 5: PAGOS / INQUILINOS ===== -->
+<div id="screen-payments" class="screen px-6 max-w-5xl mx-auto py-4">
+  <section class="mb-6">
+    <h2 class="font-headline-lg text-headline-lg text-primary mb-1">Inquilinos</h2>
+    <p class="font-body-md text-on-surface-variant">Gestiona y monitorea contratos de arrendamiento y salud de pagos.</p>
+  </section>
+  <div class="flex flex-col md:flex-row gap-4 mb-6">
+    <div class="relative flex-grow">
+      <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+      <input class="w-full pl-12 pr-4 py-3 bg-white border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary outline-none font-body-md" placeholder="Buscar por nombre, propiedad o email..." type="text"/>
+    </div>
+    <div class="flex p-1 bg-surface-container rounded-xl">
+      <button class="px-6 py-2 rounded-lg bg-white shadow-sm text-primary font-label-caps">ACTUALES</button>
+      <button class="px-6 py-2 rounded-lg text-on-surface-variant font-label-caps hover:bg-white/50">PASADOS</button>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 gap-4">
+    <!-- Tenant 1 -->
+    <div class="flex flex-col lg:flex-row items-center justify-between p-4 bg-white border border-outline-variant rounded-xl card-shadow hover:shadow-md transition-all">
+      <div class="flex items-center gap-4 w-full lg:w-1/3">
+        <div class="relative">
+          <img class="w-14 h-14 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIIL2ivWxoGTq-6Nv1J1wURiWVG_WlSvHJ-se1VQTVW2vn-Vazp6Kv5zC1lDMi_cAh50TxiDcFq7QyqUDj3s-vkw38COxJDeyMBqRp4Oc2QjWfZiBmvhZ9bDAB5keHvimUBfVqVBJhqJBFHr7Z0KwrTE4dVJHb94N4MgwtX3GzFtrQjNrl9g49oQbWZ4x3eqvzK8KKOcEUOzGcQce2E16hxFYiVi_ha1eLc21tU0z6Q9j-SYrSSyMtug" alt="Alexander"/>
+          <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-secondary rounded-full border-2 border-white"></div>
+        </div>
+        <div><p class="font-body-md font-bold text-primary">Alexander Sterling</p><p class="font-label-caps text-on-surface-variant">alex.sterling@email.com</p></div>
+      </div>
+      <div class="grid grid-cols-2 lg:flex items-center justify-between w-full lg:w-2/3 mt-4 lg:mt-0 gap-4 lg:gap-0">
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Propiedad</p><p class="font-body-md font-semibold text-primary">Villa del Mar</p></div>
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Fin de Contrato</p><div class="flex items-center gap-1 text-error"><span class="material-symbols-outlined text-[18px]">event_busy</span><p class="font-data-mono font-bold">Oct 12, 2023</p></div></div>
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Pago</p><span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-caps text-[10px]">PAGADO</span></div>
+        <div class="flex justify-end items-center lg:px-4"><button class="p-2 text-outline-variant hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button></div>
+      </div>
+    </div>
+    <!-- Tenant 2 -->
+    <div class="flex flex-col lg:flex-row items-center justify-between p-4 bg-white border border-outline-variant rounded-xl card-shadow hover:shadow-md transition-all">
+      <div class="flex items-center gap-4 w-full lg:w-1/3">
+        <div class="relative">
+          <div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold">EM</div>
+          <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-error rounded-full border-2 border-white"></div>
+        </div>
+        <div><p class="font-body-md font-bold text-primary">Elena Martinez</p><p class="font-label-caps text-on-surface-variant">e.martinez@corp.net</p></div>
+      </div>
+      <div class="grid grid-cols-2 lg:flex items-center justify-between w-full lg:w-2/3 mt-4 lg:mt-0 gap-4 lg:gap-0">
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Propiedad</p><p class="font-body-md font-semibold text-primary">Skyline Loft B4</p></div>
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Fin de Contrato</p><div class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px] text-outline">calendar_month</span><p class="font-data-mono">Ene 05, 2025</p></div></div>
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Pago</p><span class="px-3 py-1 bg-error/10 text-error rounded-full font-label-caps text-[10px]">PENDIENTE</span></div>
+        <div class="flex justify-end items-center lg:px-4"><button class="p-2 text-outline-variant hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button></div>
+      </div>
+    </div>
+    <!-- Tenant 3 -->
+    <div class="flex flex-col lg:flex-row items-center justify-between p-4 bg-white border border-outline-variant rounded-xl card-shadow hover:shadow-md transition-all">
+      <div class="flex items-center gap-4 w-full lg:w-1/3">
+        <div class="relative">
+          <img class="w-14 h-14 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC297b9l1dD3E-W_AFjEzPUstynVnGSChHJjjVQkZI-_cCZTolQOKHXhp7MP5rQoPMyqohLRDMF2bquQHZR6q9yM0el8ImVYcsbN5x_PecSzQiUj4lURD6cBXNiolrlMYP7OA0GgIxx_ipmYHcGaiJ2RxgjDKk8Iqt5RFedAb8aIbDXkwIDopQ2P5L-YBknQt1uteWS0QZPamywvqIIwj5tKSuIRSZ9eCwPNZldQjE0KL4T7RX32ZMhLg" alt="Sarah"/>
+          <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-secondary rounded-full border-2 border-white"></div>
+        </div>
+        <div><p class="font-body-md font-bold text-primary">Sarah Chen</p><p class="font-label-caps text-on-surface-variant">schen.design@web.com</p></div>
+      </div>
+      <div class="grid grid-cols-2 lg:flex items-center justify-between w-full lg:w-2/3 mt-4 lg:mt-0 gap-4 lg:gap-0">
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Propiedad</p><p class="font-body-md font-semibold text-primary">The Heritage #12</p></div>
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Fin de Contrato</p><div class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px] text-outline">calendar_month</span><p class="font-data-mono">Jun 20, 2024</p></div></div>
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Pago</p><span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-caps text-[10px]">PAGADO</span></div>
+        <div class="flex justify-end items-center lg:px-4"><button class="p-2 text-outline-variant hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button></div>
+      </div>
+    </div>
+    <!-- Tenant 4 -->
+    <div class="flex flex-col lg:flex-row items-center justify-between p-4 bg-white border border-outline-variant rounded-xl card-shadow hover:shadow-md transition-all">
+      <div class="flex items-center gap-4 w-full lg:w-1/3">
+        <div class="relative">
+          <div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant font-bold">JW</div>
+          <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-secondary rounded-full border-2 border-white"></div>
+        </div>
+        <div><p class="font-body-md font-bold text-primary">Julian Wagner</p><p class="font-label-caps text-on-surface-variant">jwagner.fin@invest.com</p></div>
+      </div>
+      <div class="grid grid-cols-2 lg:flex items-center justify-between w-full lg:w-2/3 mt-4 lg:mt-0 gap-4 lg:gap-0">
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Propiedad</p><p class="font-body-md font-semibold text-primary">Oak Ridge Estate</p></div>
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Fin de Contrato</p><div class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px] text-outline">calendar_month</span><p class="font-data-mono">Nov 15, 2024</p></div></div>
+        <div class="lg:px-4"><p class="font-label-caps text-outline mb-1">Pago</p><span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-caps text-[10px]">PAGADO</span></div>
+        <div class="flex justify-end items-center lg:px-4"><button class="p-2 text-outline-variant hover:text-primary"><span class="material-symbols-outlined">more_vert</span></button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREEN 6: REPORTES / ANALYTICS ===== -->
+<div id="screen-reports" class="screen px-6 max-w-7xl mx-auto py-4">
+  <section class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <div class="bg-white border border-outline-variant p-4 rounded-xl card-shadow flex flex-col justify-between">
+      <div><span class="font-label-caps text-on-surface-variant">PORTAFOLIO DE INVERSIÓN TOTAL</span><div class="font-stat-xl text-stat-xl mt-2 text-primary">$12,480,000.00</div></div>
+      <div class="mt-4 flex items-center justify-between"><span class="text-secondary font-label-caps flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">trending_up</span>+4.2% ANUAL</span><div class="text-on-surface-variant font-data-mono text-data-mono text-sm">Portafolio activo</div></div>
+    </div>
+    <div class="bg-white border border-outline-variant p-4 rounded-xl card-shadow flex flex-col justify-between">
+      <div><span class="font-label-caps text-on-surface-variant">RETORNOS REALES TOTALES</span><div class="font-stat-xl text-stat-xl mt-2 text-secondary">$1,842,500.00</div></div>
+      <div class="mt-4 flex items-center justify-between"><span class="text-secondary font-label-caps flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">payments</span>LIQUIDEZ NETA</span><div class="text-on-surface-variant font-data-mono text-data-mono">14.76% ROI TOTAL</div></div>
+    </div>
+  </section>
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+    <section class="md:col-span-8 bg-white border border-outline-variant p-4 rounded-xl card-shadow">
+      <div class="flex justify-between items-center mb-4"><h3 class="font-label-caps text-primary">ROI POR PROPIEDAD (TOP 5)</h3><span class="material-symbols-outlined text-outline cursor-pointer">more_vert</span></div>
+      <div class="h-56 flex items-end justify-between px-4 pt-4" id="roi-bars">
+        <div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer"><div class="w-full bg-primary-container chart-bar rounded-t-lg" style="height:92%"></div><span class="font-label-caps text-[10px] text-on-surface-variant text-center">SKYLINE TOWER<br>12.4%</span></div>
+        <div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer"><div class="w-full bg-primary-container chart-bar rounded-t-lg" style="height:84%"></div><span class="font-label-caps text-[10px] text-on-surface-variant text-center">OAKWOOD PLAZA<br>10.8%</span></div>
+        <div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer"><div class="w-full bg-primary chart-bar rounded-t-lg" style="height:100%"></div><span class="font-label-caps text-[10px] text-on-surface-variant text-center">METRO HUB<br>13.2%</span></div>
+        <div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer"><div class="w-full bg-primary-container chart-bar rounded-t-lg" style="height:76%"></div><span class="font-label-caps text-[10px] text-on-surface-variant text-center">HARBOR LOFTS<br>9.4%</span></div>
+        <div class="flex flex-col items-center gap-2 flex-1 group cursor-pointer"><div class="w-full bg-primary-container chart-bar rounded-t-lg" style="height:68%"></div><span class="font-label-caps text-[10px] text-on-surface-variant text-center">ZENITH PARK<br>8.2%</span></div>
+      </div>
+    </section>
+    <section class="md:col-span-4 bg-white border border-outline-variant p-4 rounded-xl card-shadow">
+      <h3 class="font-label-caps text-primary mb-4">DESGLOSE DE GASTOS</h3>
+      <div class="relative flex justify-center items-center py-4">
+        <div class="w-36 h-36 rounded-full border-[12px] border-surface-container-high flex flex-col items-center justify-center relative">
+          <div class="absolute inset-0 rounded-full border-[12px] border-primary border-t-transparent border-l-transparent border-r-transparent rotate-45"></div>
+          <div class="absolute inset-0 rounded-full border-[12px] border-secondary border-b-transparent border-l-transparent border-r-transparent -rotate-12"></div>
+          <span class="font-label-caps text-on-surface-variant text-[10px]">TOTAL</span>
+          <span class="font-stat-xl text-[20px]">$42.8k</span>
+        </div>
+      </div>
+      <ul class="space-y-2 mt-2">
+        <li class="flex justify-between items-center text-body-md"><span class="flex items-center gap-2"><div class="w-3 h-3 bg-primary rounded-sm"></div>Servicios</span><span class="font-bold">50%</span></li>
+        <li class="flex justify-between items-center text-body-md"><span class="flex items-center gap-2"><div class="w-3 h-3 bg-secondary rounded-sm"></div>Mantenimiento</span><span class="font-bold">25%</span></li>
+        <li class="flex justify-between items-center text-body-md"><span class="flex items-center gap-2"><div class="w-3 h-3 bg-primary-fixed-dim rounded-sm"></div>Administración</span><span class="font-bold">15%</span></li>
+        <li class="flex justify-between items-center text-body-md"><span class="flex items-center gap-2"><div class="w-3 h-3 bg-outline-variant rounded-sm"></div>Impuestos</span><span class="font-bold">10%</span></li>
+      </ul>
+    </section>
+    <section class="md:col-span-12 bg-white border border-outline-variant p-4 rounded-xl card-shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-label-caps text-primary">FLUJO DE CAJA MENSUAL (ÚLTIMOS 6 MESES)</h3>
+        <div class="flex gap-3"><div class="flex items-center gap-2 text-[10px] font-label-caps"><div class="w-2 h-2 rounded-full bg-secondary"></div>INGRESOS</div><div class="flex items-center gap-2 text-[10px] font-label-caps"><div class="w-2 h-2 rounded-full bg-error"></div>GASTOS</div></div>
+      </div>
+      <div class="h-40 w-full relative">
+        <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 100">
+          <defs><linearGradient id="grad1" x1="0%" x2="0%" y1="0%" y2="100%"><stop offset="0%" style="stop-color:#006e25;stop-opacity:1"/><stop offset="100%" style="stop-color:#006e25;stop-opacity:0"/></linearGradient></defs>
+          <path d="M0,80 L200,60 L400,65 L600,40 L800,45 L1000,20 L1000,100 L0,100 Z" fill="url(#grad1)" opacity="0.1"/>
+          <path d="M0,80 L200,60 L400,65 L600,40 L800,45 L1000,20" fill="none" stroke="#006e25" stroke-width="2" vector-effect="non-scaling-stroke"/>
+        </svg>
+        <div class="flex justify-between mt-2 border-t border-outline-variant pt-2">
+          <span class="font-label-caps text-[10px] text-outline">ENE</span><span class="font-label-caps text-[10px] text-outline">FEB</span><span class="font-label-caps text-[10px] text-outline">MAR</span><span class="font-label-caps text-[10px] text-outline">ABR</span><span class="font-label-caps text-[10px] text-outline">MAY</span><span class="font-label-caps text-[10px] text-outline">JUN</span>
+        </div>
+      </div>
+    </section>
+    <section class="md:col-span-6 bg-white border border-outline-variant p-4 rounded-xl card-shadow">
+      <div class="flex items-center justify-between"><div><span class="font-label-caps text-on-surface-variant">TASA DE OCUPACIÓN</span><div class="font-stat-xl text-stat-xl mt-2">94.2%</div></div><div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container"><span class="material-symbols-outlined text-[32px]">home_work</span></div></div>
+      <div class="mt-4 w-full bg-surface-container-high h-2 rounded-full overflow-hidden"><div class="bg-secondary h-full" style="width:94%"></div></div>
+      <p class="mt-2 text-[12px] text-on-surface-variant">+0.8% vs trimestre anterior</p>
+    </section>
+    <section class="md:col-span-6 bg-white border border-outline-variant p-4 rounded-xl card-shadow">
+      <div class="flex items-center justify-between"><div><span class="font-label-caps text-on-surface-variant">TASA DE MOROSIDAD</span><div class="font-stat-xl text-stat-xl mt-2 text-error">2.1%</div></div><div class="w-16 h-16 rounded-full bg-error-container flex items-center justify-center text-on-error-container"><span class="material-symbols-outlined text-[32px]">warning</span></div></div>
+      <div class="mt-4 w-full bg-surface-container-high h-2 rounded-full overflow-hidden"><div class="bg-error h-full" style="width:2%"></div></div>
+      <p class="mt-2 text-[12px] text-on-surface-variant">Umbral de bajo riesgo mantenido</p>
+    </section>
+    <section class="md:col-span-12 bg-white border border-outline-variant rounded-xl card-shadow overflow-hidden mb-4">
+      <div class="p-4 border-b border-outline-variant bg-surface-container-low flex justify-between items-center"><h3 class="font-label-caps text-primary">DESEMBOLSOS RECIENTES</h3><button class="text-primary font-label-caps flex items-center gap-1 hover:underline text-label-caps">VER TODO <span class="material-symbols-outlined text-[14px]">arrow_forward</span></button></div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead><tr class="bg-surface font-label-caps text-[10px] text-outline-variant"><th class="px-4 py-3">ENTIDAD</th><th class="px-4 py-3">TIPO</th><th class="px-4 py-3">MONTO</th><th class="px-4 py-3">ESTADO</th></tr></thead>
+          <tbody class="divide-y divide-outline-variant">
+            <tr class="hover:bg-surface-container-low"><td class="px-4 py-3 font-body-md text-primary">Skyline Tower Maint.</td><td class="px-4 py-3 font-label-caps text-[11px]">SERVICIOS</td><td class="px-4 py-3 font-data-mono text-error">-$2,450.00</td><td class="px-4 py-3"><span class="pill-status bg-secondary/10 text-secondary">PROCESADO</span></td></tr>
+            <tr class="hover:bg-surface-container-low"><td class="px-4 py-3 font-body-md text-primary">Metro Hub Rent Collection</td><td class="px-4 py-3 font-label-caps text-[11px]">INGRESOS</td><td class="px-4 py-3 font-data-mono text-secondary">+$14,200.00</td><td class="px-4 py-3"><span class="pill-status bg-secondary/10 text-secondary">PROCESADO</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ===== SCREEN 7: PROVEEDORES ===== -->
+<div id="screen-providers" class="screen px-6 max-w-7xl mx-auto py-4">
+  <section class="space-y-4 mb-4">
+    <div class="relative">
+      <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+      <input class="w-full h-12 pl-12 pr-4 bg-white border border-outline-variant rounded-lg focus:ring-2 focus:ring-primary outline-none text-body-md" placeholder="Buscar proveedores por nombre o categoría..." type="text" id="provider-search"/>
+    </div>
+    <div class="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+      <button class="px-6 py-2 rounded-full bg-primary text-white font-label-caps text-label-caps whitespace-nowrap">Todos</button>
+      <button class="px-6 py-2 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap hover:bg-surface-container-low">Mantenimiento</button>
+      <button class="px-6 py-2 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap hover:bg-surface-container-low">Servicios</button>
+      <button class="px-6 py-2 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap hover:bg-surface-container-low">Legal</button>
+      <button class="px-6 py-2 rounded-full bg-white border border-outline-variant text-on-surface-variant font-label-caps text-label-caps whitespace-nowrap hover:bg-surface-container-low">Limpieza</button>
+    </div>
+  </section>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <!-- Provider 1 -->
+    <div class="bg-white border border-outline-variant rounded-xl p-4 card-shadow flex flex-col gap-3 hover:border-primary transition-colors cursor-pointer">
+      <div class="flex justify-between items-start">
+        <div class="flex gap-3">
+          <div class="w-12 h-12 rounded-lg bg-surface-container-high overflow-hidden flex-shrink-0"><img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzVvkYigU0AYyYm65nbljTG3G8dAyNcbdyiBagjvY08qtk9xhy8A6WEXwEZ9iakwpFgcV4et6hDXkV2oA__KMEPm_5jEdAwrfbgXoi69GRKbozRwLbNSeYUmCiVXmGVhL5so-aGSZ0QmZ_u2kI6Q1KK1VHI4ew3obLvdLkkmC2v6RnOpeXitMbYWo5DIplMYsQhnwgi3wxfGhtY9Na50c85e7rYj9icHNvQRNXLF7CB6jPK8ijz27xHA" alt="Rodriguez"/></div>
+          <div><h3 class="font-body-md font-bold text-primary text-sm">Rodriguez Plumbing</h3><span class="font-label-caps text-[10px] text-secondary bg-secondary-container px-2 py-0.5 rounded">Plomería</span></div>
+        </div>
+        <div class="flex items-center gap-1"><span class="material-symbols-outlined text-tertiary-fixed-dim text-sm" style="font-variation-settings:'FILL' 1;">star</span><span class="text-data-mono font-bold">4.9</span></div>
+      </div>
+      <div class="flex items-center gap-2 text-on-surface-variant"><span class="material-symbols-outlined text-lg">apartment</span><span class="text-data-mono text-sm">12 Propiedades</span></div>
+      <div class="flex gap-2 mt-auto">
+        <button class="flex-1 h-10 border border-outline-variant rounded-lg flex items-center justify-center gap-2 text-primary font-label-caps text-label-caps hover:bg-surface-container-low"><span class="material-symbols-outlined text-lg">call</span>Llamar</button>
+        <button class="flex-1 h-10 bg-primary text-white rounded-lg flex items-center justify-center gap-2 font-label-caps text-label-caps hover:opacity-90">Ver Perfil</button>
+      </div>
+    </div>
+    <!-- Provider 2 -->
+    <div class="bg-white border border-outline-variant rounded-xl p-4 card-shadow flex flex-col gap-3 hover:border-primary transition-colors cursor-pointer">
+      <div class="flex justify-between items-start">
+        <div class="flex gap-3">
+          <div class="w-12 h-12 rounded-lg bg-surface-container-high overflow-hidden flex-shrink-0"><img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAorYAURssVQyBu8BdySENu967swSGNhe5quh-JeHeZcYeN_GkI5rGdQtY0QdF7s4i6kqfEruLonySZ-0l-LrCXx1mKNrz1niWfwXGhx9cgHqWUfI0dORBWQW3KKI3pV4PI4o2aeArFabjENlMydRL067PDJY3ZtRmUYOYr3hhaPrc3RN3U6qwLoTYrdbesbIcpnriap2vr7UzqrvwOUzAnVsuZZ1TzS2x9KINI19gx0tZMQ0UydQBshg" alt="Volts"/></div>
+          <div><h3 class="font-body-md font-bold text-primary text-sm">Volts &amp; Amps Electrical</h3><span class="font-label-caps text-[10px] text-secondary bg-secondary-container px-2 py-0.5 rounded">Electricidad</span></div>
+        </div>
+        <div class="flex items-center gap-1"><span class="material-symbols-outlined text-tertiary-fixed-dim text-sm" style="font-variation-settings:'FILL' 1;">star</span><span class="text-data-mono font-bold">4.7</span></div>
+      </div>
+      <div class="flex items-center gap-2 text-on-surface-variant"><span class="material-symbols-outlined text-lg">apartment</span><span class="text-data-mono text-sm">8 Propiedades</span></div>
+      <div class="flex gap-2 mt-auto">
+        <button class="flex-1 h-10 border border-outline-variant rounded-lg flex items-center justify-center gap-2 text-primary font-label-caps text-label-caps hover:bg-surface-container-low"><span class="material-symbols-outlined text-lg">call</span>Llamar</button>
+        <button class="flex-1 h-10 bg-primary text-white rounded-lg flex items-center justify-center gap-2 font-label-caps text-label-caps hover:opacity-90">Ver Perfil</button>
+      </div>
+    </div>
+    <!-- Provider 3 -->
+    <div class="bg-white border border-outline-variant rounded-xl p-4 card-shadow flex flex-col gap-3 hover:border-primary transition-colors cursor-pointer">
+      <div class="flex justify-between items-start">
+        <div class="flex gap-3">
+          <div class="w-12 h-12 rounded-lg bg-surface-container-high overflow-hidden flex-shrink-0"><img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV2MwUoK9U6AEieKm0CygIq8I9Kum1P6Biu_77aaYDDT9NShegt5d91w2MOlZOIu6zPROLQKdN-JZdWtn-A5uZpdOtXVsTcGVjm4PoLrsp20j_u_V7Py4LpP9iMX-LGKDU8Pat8OrXfJFydUZ8TunXooqOKAt_u2prE9y4DzkQcPM4GUffO7d0lfDwEUymrgvyUfzKRwM18sfFuo-OzV8vmMlYFS9G1Dxodq2aYEXNLgo9AwTypBXlsw" alt="Elite"/></div>
+          <div><h3 class="font-body-md font-bold text-primary text-sm">Elite Cleaning Services</h3><span class="font-label-caps text-[10px] text-secondary bg-secondary-container px-2 py-0.5 rounded">Limpieza</span></div>
+        </div>
+        <div class="flex items-center gap-1"><span class="material-symbols-outlined text-tertiary-fixed-dim text-sm" style="font-variation-settings:'FILL' 1;">star</span><span class="text-data-mono font-bold">5.0</span></div>
+      </div>
+      <div class="flex items-center gap-2 text-on-surface-variant"><span class="material-symbols-outlined text-lg">apartment</span><span class="text-data-mono text-sm">24 Propiedades</span></div>
+      <div class="flex gap-2 mt-auto">
+        <button class="flex-1 h-10 border border-outline-variant rounded-lg flex items-center justify-center gap-2 text-primary font-label-caps text-label-caps hover:bg-surface-container-low"><span class="material-symbols-outlined text-lg">call</span>Llamar</button>
+        <button class="flex-1 h-10 bg-primary text-white rounded-lg flex items-center justify-center gap-2 font-label-caps text-label-caps hover:opacity-90">Ver Perfil</button>
+      </div>
+    </div>
+    <!-- Provider 4 -->
+    <div class="bg-white border border-outline-variant rounded-xl p-4 card-shadow flex flex-col gap-3 hover:border-primary transition-colors cursor-pointer">
+      <div class="flex justify-between items-start">
+        <div class="flex gap-3">
+          <div class="w-12 h-12 rounded-lg bg-surface-container-high overflow-hidden flex-shrink-0"><img class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAImTxpI35RUFjzfltSQwrJmwjqgeNX9q_L9w7UNFbg538nJAEel-jda7Yyu7n_49t61Jb_rwMqFPTO1v-UBlvSlKzi1doBosr-aFlGLhjCbGGIPG1SrxPuIp-vL8nKjFXlZV6twrRAhn61I4Jok1aRVLO8tmoH7C09GyRnSst5_nMSYvT9-6wlXKmA2gTwPmY-cjxF4bJeLSghkHlRK3KuB4eRxdLEF81CPihty6xK0KbmeiWd9Z4Czw" alt="Apex Legal"/></div>
+          <div><h3 class="font-body-md font-bold text-primary text-sm">Apex Legal Partners</h3><span class="font-label-caps text-[10px] text-secondary bg-secondary-container px-2 py-0.5 rounded">Legal</span></div>
+        </div>
+        <div class="flex items-center gap-1"><span class="material-symbols-outlined text-tertiary-fixed-dim text-sm" style="font-variation-settings:'FILL' 1;">star</span><span class="text-data-mono font-bold">4.8</span></div>
+      </div>
+      <div class="flex items-center gap-2 text-on-surface-variant"><span class="material-symbols-outlined text-lg">apartment</span><span class="text-data-mono text-sm">5 Propiedades</span></div>
+      <div class="flex gap-2 mt-auto">
+        <button class="flex-1 h-10 border border-outline-variant rounded-lg flex items-center justify-center gap-2 text-primary font-label-caps text-label-caps hover:bg-surface-container-low"><span class="material-symbols-outlined text-lg">call</span>Llamar</button>
+        <button class="flex-1 h-10 bg-primary text-white rounded-lg flex items-center justify-center gap-2 font-label-caps text-label-caps hover:opacity-90">Ver Perfil</button>
+      </div>
+    </div>
+  </div>
+  <button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-90 transition-all z-40">
+    <span class="material-symbols-outlined text-2xl">person_add</span>
+  </button>
+</div>
+
+<!-- ===== SCREEN 8: CONFIGURACIÓN ===== -->
+<div id="screen-settings" class="screen px-6 max-w-3xl mx-auto py-4">
+  <section class="mb-6">
+    <h2 class="font-headline-lg text-headline-lg text-primary mb-1">Configuración</h2>
+    <p class="font-body-md text-on-surface-variant">Administra tu cuenta, notificaciones y preferencias.</p>
+  </section>
+  <!-- Profile Card -->
+  <div class="bg-white border border-outline-variant rounded-xl p-6 card-shadow mb-4 flex items-center gap-4">
+    <img class="w-16 h-16 rounded-full object-cover border-2 border-primary-container" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVBGi0X1dH9qvZS8AqkFZalRpMDg5Zdm_z34dLrEIZ4mGMs5SOM8EMEJlcmTP0BiJbIUD4rBgH2DbRhy-v1Y1tabOY-LThrvWKu52m0tFXKo2RJIvB3V3jFe2RwygIny88L1qBeQ8_Nr1QokRghP2K3kezEkO_UQIU0y5CXVJQIqvO5Dkzn-6jMTmn23U70widlG51yC-wrkLp_S-aVMNCq8FodcoKfUh78dw8RKJlaeLwexU0-gZyKg" alt="Profile"/>
+    <div class="flex-1">
+      <h3 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">Eduardo Pérez</h3>
+      <p class="text-on-surface-variant font-body-md">eduardo.perez@propwealth.com</p>
+      <span class="bg-secondary-container text-on-secondary-container px-3 py-0.5 rounded-full text-[10px] font-bold mt-1 inline-block">PLAN EJECUTIVO PRO</span>
+    </div>
+    <button class="px-4 py-2 border border-outline text-primary rounded-lg font-label-caps text-label-caps hover:bg-surface-container-low">EDITAR</button>
+  </div>
+  <!-- Settings Groups -->
+  <div class="space-y-4">
+    <div class="bg-white border border-outline-variant rounded-xl card-shadow overflow-hidden">
+      <div class="p-4 border-b border-outline-variant bg-surface-container-low"><h3 class="font-label-caps text-label-caps text-primary">NOTIFICACIONES</h3></div>
+      <div class="divide-y divide-outline-variant">
+        <div class="flex items-center justify-between p-4"><div><p class="font-body-md font-semibold text-primary">Alertas de pago</p><p class="text-sm text-on-surface-variant">Recibe notificaciones de pagos vencidos</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"/><div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div></label></div>
+        <div class="flex items-center justify-between p-4"><div><p class="font-body-md font-semibold text-primary">Recordatorios de mantenimiento</p><p class="text-sm text-on-surface-variant">Alertas 7 días antes del servicio</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" checked class="sr-only peer"/><div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div></label></div>
+        <div class="flex items-center justify-between p-4"><div><p class="font-body-md font-semibold text-primary">Reportes semanales</p><p class="text-sm text-on-surface-variant">Resumen financiero cada lunes</p></div><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer"/><div class="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-secondary"></div></label></div>
+      </div>
+    </div>
+    <div class="bg-white border border-outline-variant rounded-xl card-shadow overflow-hidden">
+      <div class="p-4 border-b border-outline-variant bg-surface-container-low"><h3 class="font-label-caps text-label-caps text-primary">PREFERENCIAS</h3></div>
+      <div class="divide-y divide-outline-variant">
+        <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-surface-container-low"><div><p class="font-body-md font-semibold text-primary">Idioma</p><p class="text-sm text-on-surface-variant">Español</p></div><span class="material-symbols-outlined text-outline-variant">chevron_right</span></div>
+        <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-surface-container-low"><div><p class="font-body-md font-semibold text-primary">Moneda</p><p class="text-sm text-on-surface-variant">USD — Dólar Estadounidense</p></div><span class="material-symbols-outlined text-outline-variant">chevron_right</span></div>
+        <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-surface-container-low"><div><p class="font-body-md font-semibold text-primary">Zona horaria</p><p class="text-sm text-on-surface-variant">UTC-5, Ciudad de México</p></div><span class="material-symbols-outlined text-outline-variant">chevron_right</span></div>
+      </div>
+    </div>
+    <div class="bg-white border border-outline-variant rounded-xl card-shadow overflow-hidden mb-4">
+      <div class="p-4 border-b border-outline-variant bg-surface-container-low"><h3 class="font-label-caps text-label-caps text-primary">SEGURIDAD</h3></div>
+      <div class="divide-y divide-outline-variant">
+        <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-surface-container-low"><div><p class="font-body-md font-semibold text-primary">Cambiar contraseña</p></div><span class="material-symbols-outlined text-outline-variant">chevron_right</span></div>
+        <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-surface-container-low"><div><p class="font-body-md font-semibold text-primary">Autenticación de dos factores</p><p class="text-sm text-on-surface-variant">Activa para mayor seguridad</p></div><span class="material-symbols-outlined text-outline-variant">chevron_right</span></div>
+        <div class="flex items-center justify-between p-4 cursor-pointer hover:bg-surface-container-low"><div><p class="font-body-md font-semibold text-error">Cerrar sesión</p></div><span class="material-symbols-outlined text-error">logout</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end pt-16 pb-20 -->
+
+<!-- ===== BOTTOM NAVIGATION ===== -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-primary border-t border-outline-variant shadow-sm" id="bottom-nav">
+  <button class="nav-item flex flex-col items-center justify-center text-secondary-fixed font-bold py-1 px-3 rounded-lg" data-screen="screen-dashboard" onclick="showScreen('screen-dashboard')">
+    <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">dashboard</span>
+    <span class="font-label-caps text-[10px] mt-0.5">Dashboard</span>
+  </button>
+  <button class="nav-item flex flex-col items-center justify-center text-on-primary opacity-70 py-1 px-3 rounded-lg" data-screen="screen-properties" onclick="showScreen('screen-properties')">
+    <span class="material-symbols-outlined">domain</span>
+    <span class="font-label-caps text-[10px] mt-0.5">Propiedades</span>
+  </button>
+  <button class="nav-item flex flex-col items-center justify-center text-on-primary opacity-70 py-1 px-3 rounded-lg" data-screen="screen-payments" onclick="showScreen('screen-payments')">
+    <span class="material-symbols-outlined">payments</span>
+    <span class="font-label-caps text-[10px] mt-0.5">Pagos</span>
+  </button>
+  <button class="nav-item flex flex-col items-center justify-center text-on-primary opacity-70 py-1 px-3 rounded-lg" data-screen="screen-reports" onclick="showScreen('screen-reports')">
+    <span class="material-symbols-outlined">analytics</span>
+    <span class="font-label-caps text-[10px] mt-0.5">Reportes</span>
+  </button>
+  <button class="nav-item flex flex-col items-center justify-center text-on-primary opacity-70 py-1 px-3 rounded-lg" data-screen="screen-settings" onclick="showScreen('screen-settings')">
+    <span class="material-symbols-outlined">settings</span>
+    <span class="font-label-caps text-[10px] mt-0.5">Ajustes</span>
+  </button>
+</nav>
+
+<script>
+// Screens that should not affect the main nav active state
+const SECONDARY_SCREENS = ['screen-property-detail','screen-add-property','screen-providers'];
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.add('active');
+    window.scrollTo(0,0);
+  }
+  // Update nav if primary screen
+  if (!SECONDARY_SCREENS.includes(id)) {
+    document.querySelectorAll('.nav-item').forEach(btn => {
+      const isActive = btn.dataset.screen === id;
+      btn.classList.toggle('text-secondary-fixed', isActive);
+      btn.classList.toggle('font-bold', isActive);
+      btn.classList.toggle('opacity-70', !isActive);
+      btn.classList.toggle('text-on-primary', !isActive);
+      const icon = btn.querySelector('.material-symbols-outlined');
+      if (icon) icon.style.fontVariationSettings = isActive ? "'FILL' 1" : "'FILL' 0";
+    });
+  }
+  // Hide FAB on non-property screens
+  const fab = document.querySelector('button.fixed.bottom-24');
+  if (fab) fab.style.display = (id === 'screen-properties' || id === 'screen-providers') ? 'flex' : 'none';
+}
+
+// Bar chart animation on load
+window.addEventListener('DOMContentLoaded', () => {
+  const animateBars = () => {
+    document.querySelectorAll('.chart-bar').forEach(bar => {
+      const h = bar.style.height;
+      bar.style.height = '0%';
+      setTimeout(() => { bar.style.height = h; }, 400);
+    });
+  };
+  animateBars();
+
+  // Provider search filter
+  const search = document.getElementById('provider-search');
+  if (search) {
+    search.addEventListener('input', e => {
+      const q = e.target.value.toLowerCase();
+      document.querySelectorAll('#screen-providers .grid > div').forEach(card => {
+        const t = card.querySelector('h3')?.textContent.toLowerCase() || '';
+        const c = card.querySelector('span')?.textContent.toLowerCase() || '';
+        card.style.display = (t.includes(q) || c.includes(q)) ? '' : 'none';
+      });
+    });
+  }
+
+  // Property filter chips
+  document.querySelectorAll('#screen-properties .flex.gap-2 button').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#screen-properties .flex.gap-2 button').forEach(b => {
+        b.classList.remove('bg-primary','text-on-primary');
+        b.classList.add('bg-white','border','border-outline-variant','text-on-surface-variant');
+      });
+      this.classList.add('bg-primary','text-on-primary');
+      this.classList.remove('bg-white','border','border-outline-variant','text-on-surface-variant');
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Tenant Management - PropWealth</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#241300",
+                    "outline-variant": "#c5c6ce",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#374765",
+                    "primary": "#031632",
+                    "tertiary-fixed": "#ffddb9",
+                    "tertiary-container": "#402500",
+                    "surface-dim": "#d9dadb",
+                    "outline": "#75777e",
+                    "on-secondary-fixed-variant": "#00531a",
+                    "on-tertiary-fixed-variant": "#663e00",
+                    "on-primary-fixed": "#081b38",
+                    "on-secondary-container": "#007327",
+                    "secondary-fixed": "#83fc8e",
+                    "on-primary": "#ffffff",
+                    "background": "#f8f9fa",
+                    "surface-container-high": "#e7e8e9",
+                    "on-surface-variant": "#44474d",
+                    "primary-fixed": "#d7e2ff",
+                    "on-surface": "#191c1d",
+                    "on-background": "#191c1d",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f3f4f5",
+                    "on-secondary-fixed": "#002106",
+                    "tertiary-fixed-dim": "#ffb961",
+                    "surface-tint": "#4e5f7e",
+                    "inverse-on-surface": "#f0f1f2",
+                    "secondary-fixed-dim": "#66df75",
+                    "primary-container": "#1a2b48",
+                    "primary-fixed-dim": "#b6c7eb",
+                    "inverse-primary": "#b6c7eb",
+                    "on-primary-container": "#8293b5",
+                    "surface-container-highest": "#e1e3e4",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#cd8100",
+                    "surface": "#f8f9fa",
+                    "inverse-surface": "#2e3132",
+                    "surface-variant": "#e1e3e4",
+                    "on-tertiary-fixed": "#2b1700",
+                    "secondary-container": "#80f98b",
+                    "surface-bright": "#f8f9fa",
+                    "surface-container": "#edeeef",
+                    "on-error": "#ffffff",
+                    "secondary": "#006e25",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "stack-lg": "24px",
+                    "container-padding": "24px",
+                    "base": "8px",
+                    "stack-md": "12px",
+                    "stack-sm": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "stat-xl": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "data-mono": ["Inter"],
+                    "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "stat-xl": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .tenant-card-hover { transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease; }
+        .tenant-card-hover:active { transform: scale(0.98); }
+        .glass-panel { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-container-padding py-base max-w-7xl mx-auto bg-surface dark:bg-surface-container-low border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-stack-md">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">PropWealth</h1>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high dark:hover:bg-surface-container-highest transition-colors active:opacity-80 active:scale-95">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+</header>
+<main class="mt-20 px-container-padding max-w-5xl mx-auto">
+<!-- Header Section -->
+<section class="mb-stack-lg">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-base">Tenants</h2>
+<p class="font-body-md text-on-surface-variant">Manage and monitor lease agreements and payment health.</p>
+</section>
+<!-- Search and Filters -->
+<div class="flex flex-col md:flex-row gap-gutter mb-stack-lg">
+<div class="relative flex-grow">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-12 pr-4 py-3 bg-white border border-outline-variant rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-body-md" placeholder="Search by name, property, or email..." type="text"/>
+</div>
+<div class="flex p-1 bg-surface-container rounded-xl">
+<button class="px-6 py-2 rounded-lg bg-white shadow-sm text-primary font-label-caps transition-all" id="currentBtn">CURRENT</button>
+<button class="px-6 py-2 rounded-lg text-on-surface-variant font-label-caps hover:bg-white/50 transition-all" id="pastBtn">PAST</button>
+</div>
+</div>
+<!-- Tenant List Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-gutter">
+<!-- Tenant Item 1 -->
+<div class="tenant-card-hover group flex flex-col lg:flex-row items-center justify-between p-stack-lg bg-white border border-outline-variant rounded-xl shadow-sm hover:shadow-md">
+<div class="flex items-center gap-gutter w-full lg:w-1/3">
+<div class="relative">
+<img class="w-14 h-14 rounded-full object-cover" data-alt="A professional corporate headshot of a middle-aged man with short hair, wearing a navy blue suit and white shirt. The lighting is crisp and modern, set against a blurred minimalist office background. The aesthetic is clean, high-resolution, and executive-focused to match the financial wealth management theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIIL2ivWxoGTq-6Nv1J1wURiWVG_WlSvHJ-se1VQTVW2vn-Vazp6Kv5zC1lDMi_cAh50TxiDcFq7QyqUDj3s-vkw38COxJDeyMBqRp4Oc2QjWfZiBmvhZ9bDAB5keHvimUBfVqVBJhqJBFHr7Z0KwrTE4dVJHb94N4MgwtX3GzFtrQjNrl9g49oQbWZ4x3eqvzK8KKOcEUOzGcQce2E16hxFYiVi_ha1eLc21tU0z6Q9j-SYrSSyMtug"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-secondary rounded-full border-2 border-white"></div>
+</div>
+<div>
+<p class="font-body-md font-bold text-primary">Alexander Sterling</p>
+<p class="font-label-caps text-on-surface-variant">alex.sterling@email.com</p>
+</div>
+</div>
+<div class="grid grid-cols-2 lg:flex items-center justify-between w-full lg:w-2/3 mt-gutter lg:mt-0 gap-gutter lg:gap-0">
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Property</p>
+<p class="font-body-md font-semibold text-primary">Villa del Mar</p>
+</div>
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Contract End</p>
+<div class="flex items-center gap-1 text-error">
+<span class="material-symbols-outlined text-[18px]">event_busy</span>
+<p class="font-data-mono font-bold">Oct 12, 2023</p>
+</div>
+</div>
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Payment</p>
+<span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-caps text-[10px]">PAID</span>
+</div>
+<div class="flex justify-end items-center lg:px-gutter">
+<button class="p-2 text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Tenant Item 2 -->
+<div class="tenant-card-hover group flex flex-col lg:flex-row items-center justify-between p-stack-lg bg-white border border-outline-variant rounded-xl shadow-sm hover:shadow-md">
+<div class="flex items-center gap-gutter w-full lg:w-1/3">
+<div class="relative">
+<div class="w-14 h-14 rounded-full bg-primary-container flex items-center justify-center text-primary font-bold">EM</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-error rounded-full border-2 border-white"></div>
+</div>
+<div>
+<p class="font-body-md font-bold text-primary">Elena Martinez</p>
+<p class="font-label-caps text-on-surface-variant">e.martinez@corp.net</p>
+</div>
+</div>
+<div class="grid grid-cols-2 lg:flex items-center justify-between w-full lg:w-2/3 mt-gutter lg:mt-0 gap-gutter lg:gap-0">
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Property</p>
+<p class="font-body-md font-semibold text-primary">Skyline Loft B4</p>
+</div>
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Contract End</p>
+<div class="flex items-center gap-1 text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-outline">calendar_month</span>
+<p class="font-data-mono">Jan 05, 2025</p>
+</div>
+</div>
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Payment</p>
+<span class="px-3 py-1 bg-error/10 text-error rounded-full font-label-caps text-[10px]">PENDING</span>
+</div>
+<div class="flex justify-end items-center lg:px-gutter">
+<button class="p-2 text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Tenant Item 3 -->
+<div class="tenant-card-hover group flex flex-col lg:flex-row items-center justify-between p-stack-lg bg-white border border-outline-variant rounded-xl shadow-sm hover:shadow-md">
+<div class="flex items-center gap-gutter w-full lg:w-1/3">
+<div class="relative">
+<img class="w-14 h-14 rounded-full object-cover" data-alt="A portrait of a professional woman with a warm, confident expression. She has curly dark hair and is wearing a sleek grey blazer against a bright, airy architectural background. The overall style is corporate modern, with high-end digital photography clarity and a focus on financial professionalism." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC297b9l1dD3E-W_AFjEzPUstynVnGSChHJjjVQkZI-_cCZTolQOKHXhp7MP5rQoPMyqohLRDMF2bquQHZR6q9yM0el8ImVYcsbN5x_PecSzQiUj4lURD6cBXNiolrlMYP7OA0GgIxx_ipmYHcGaiJ2RxgjDKk8Iqt5RFedAb8aIbDXkwIDopQ2P5L-YBknQt1uteWS0QZPamywvqIIwj5tKSuIRSZ9eCwPNZldQjE0KL4T7RX32ZMhLg"/>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-secondary rounded-full border-2 border-white"></div>
+</div>
+<div>
+<p class="font-body-md font-bold text-primary">Sarah Chen</p>
+<p class="font-label-caps text-on-surface-variant">schen.design@web.com</p>
+</div>
+</div>
+<div class="grid grid-cols-2 lg:flex items-center justify-between w-full lg:w-2/3 mt-gutter lg:mt-0 gap-gutter lg:gap-0">
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Property</p>
+<p class="font-body-md font-semibold text-primary">The Heritage #12</p>
+</div>
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Contract End</p>
+<div class="flex items-center gap-1 text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-outline">calendar_month</span>
+<p class="font-data-mono">Jun 20, 2024</p>
+</div>
+</div>
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Payment</p>
+<span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-caps text-[10px]">PAID</span>
+</div>
+<div class="flex justify-end items-center lg:px-gutter">
+<button class="p-2 text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Tenant Item 4 -->
+<div class="tenant-card-hover group flex flex-col lg:flex-row items-center justify-between p-stack-lg bg-white border border-outline-variant rounded-xl shadow-sm hover:shadow-md">
+<div class="flex items-center gap-gutter w-full lg:w-1/3">
+<div class="relative">
+<div class="w-14 h-14 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface-variant font-bold">JW</div>
+<div class="absolute -bottom-1 -right-1 w-4 h-4 bg-secondary rounded-full border-2 border-white"></div>
+</div>
+<div>
+<p class="font-body-md font-bold text-primary">Julian Wagner</p>
+<p class="font-label-caps text-on-surface-variant">jwagner.fin@invest.com</p>
+</div>
+</div>
+<div class="grid grid-cols-2 lg:flex items-center justify-between w-full lg:w-2/3 mt-gutter lg:mt-0 gap-gutter lg:gap-0">
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Property</p>
+<p class="font-body-md font-semibold text-primary">Oak Ridge Estate</p>
+</div>
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Contract End</p>
+<div class="flex items-center gap-1 text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-outline">calendar_month</span>
+<p class="font-data-mono">Nov 15, 2024</p>
+</div>
+</div>
+<div class="lg:px-gutter">
+<p class="font-label-caps text-outline uppercase mb-1">Payment</p>
+<span class="px-3 py-1 bg-secondary/10 text-secondary rounded-full font-label-caps text-[10px]">PAID</span>
+</div>
+<div class="flex justify-end items-center lg:px-gutter">
+<button class="p-2 text-outline-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Active on 'Payments') -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-gutter py-stack-md bg-primary dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline shadow-sm">
+<!-- Dashboard -->
+<a class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<!-- Properties -->
+<a class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">domain</span>
+<span class="font-label-caps text-label-caps">Properties</span>
+</a>
+<!-- Payments (ACTIVE) -->
+<a class="flex flex-col items-center justify-center text-secondary-fixed dark:text-secondary font-bold transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="font-label-caps text-label-caps">Payments</span>
+</a>
+<!-- Reports -->
+<a class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps">Reports</span>
+</a>
+<!-- Settings -->
+<a class="flex flex-col items-center justify-center text-on-primary dark:text-on-surface-variant opacity-70 hover:bg-primary-container dark:hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+<script>
+        // Simple Toggle Script
+        const currentBtn = document.getElementById('currentBtn');
+        const pastBtn = document.getElementById('pastBtn');
+
+        currentBtn.addEventListener('click', () => {
+            currentBtn.classList.add('bg-white', 'shadow-sm', 'text-primary');
+            currentBtn.classList.remove('text-on-surface-variant');
+            pastBtn.classList.remove('bg-white', 'shadow-sm', 'text-primary');
+            pastBtn.classList.add('text-on-surface-variant');
+        });
+
+        pastBtn.addEventListener('click', () => {
+            pastBtn.classList.add('bg-white', 'shadow-sm', 'text-primary');
+            pastBtn.classList.remove('text-on-surface-variant');
+            currentBtn.classList.remove('bg-white', 'shadow-sm', 'text-primary');
+            currentBtn.classList.add('text-on-surface-variant');
+        });
+
+        // Add micro-interaction to cards
+        document.querySelectorAll('.tenant-card-hover').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.borderColor = 'var(--tw-colors-primary)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.borderColor = '';
+            });
+        });
+    </script>
+</body></html>
