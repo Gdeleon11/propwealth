@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { Tenant } from '@/lib/supabase'
+import type { Tenant } from '@/lib/db'
+import AddTenantModal from './AddTenantModal'
 
 const PAYMENT_STYLES: Record<string, string> = {
   paid: 'bg-secondary/10 text-secondary',
@@ -17,6 +18,8 @@ export default function Tenants() {
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<'current' | 'past'>('current')
   const [search, setSearch] = useState('')
+  const [showAdd, setShowAdd] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     setLoading(true)
@@ -29,8 +32,16 @@ export default function Tenants() {
   const filtered = tenants.filter(t =>
     t.full_name.toLowerCase().includes(search.toLowerCase()) ||
     t.email.toLowerCase().includes(search.toLowerCase()) ||
-    (t.property as any)?.name?.toLowerCase().includes(search.toLowerCase())
+    (t.property_name as string | undefined)?.toLowerCase().includes(search.toLowerCase())
   )
+
+  const remove = async (id: string) => {
+    if (!window.confirm('Eliminar este inquilino?')) return
+    setDeletingId(id)
+    const res = await fetch(`/api/tenants?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+    if (res.ok) setTenants(current => current.filter(t => t.id !== id))
+    setDeletingId(null)
+  }
 
   return (
     <div className="px-6 py-4">
@@ -63,6 +74,13 @@ export default function Tenants() {
             PASADOS
           </button>
         </div>
+        <button
+          onClick={() => setShowAdd(true)}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:opacity-90 font-semibold text-[11px] tracking-wider"
+        >
+          <span className="material-symbols-outlined text-lg">add</span>
+          AGREGAR
+        </button>
       </div>
 
       {loading ? (
@@ -99,7 +117,7 @@ export default function Tenants() {
               <div className="grid grid-cols-2 lg:flex items-center justify-between w-full lg:w-2/3 mt-4 lg:mt-0 gap-4 lg:gap-0">
                 <div className="lg:px-4">
                   <p className="text-[11px] font-semibold tracking-wider text-outline uppercase mb-1">Propiedad</p>
-                  <p className="font-semibold text-base text-primary">{(t.property as any)?.name || '—'}</p>
+                  <p className="font-semibold text-base text-primary">{t.property_name || '—'}</p>
                 </div>
                 <div className="lg:px-4">
                   <p className="text-[11px] font-semibold tracking-wider text-outline uppercase mb-1">Fin de Contrato</p>
@@ -117,8 +135,13 @@ export default function Tenants() {
                   </span>
                 </div>
                 <div className="flex justify-end items-center lg:px-4">
-                  <button className="p-2 text-outline-variant hover:text-primary">
-                    <span className="material-symbols-outlined">more_vert</span>
+                  <button
+                    onClick={() => remove(t.id)}
+                    disabled={deletingId === t.id}
+                    className="p-2 text-error hover:bg-error hover:text-white rounded-lg disabled:opacity-50"
+                    title="Eliminar inquilino"
+                  >
+                    <span className="material-symbols-outlined">{deletingId === t.id ? 'hourglass_top' : 'delete'}</span>
                   </button>
                 </div>
               </div>
@@ -126,6 +149,7 @@ export default function Tenants() {
           ))}
         </div>
       )}
+      {showAdd && <AddTenantModal onClose={() => setShowAdd(false)} onSaved={(tenant) => { setShowAdd(false); setTenants(current => [tenant, ...current]) }} />}
     </div>
   )
 }

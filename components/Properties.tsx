@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { Property } from '@/lib/supabase'
+import type { Property } from '@/lib/db'
 import AddPropertyModal from './AddPropertyModal'
+import PropertyDetail from './PropertyDetail'
 
 const STATUS_LABELS: Record<string, string> = {
   rented: 'Rentado',
@@ -27,6 +28,8 @@ export default function Properties() {
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [selectedProperty, setSelectedProperty] = useState<{ property: Property; imageUrl: string } | null>(null)
 
   const load = (f = 'all') => {
     setLoading(true)
@@ -42,6 +45,28 @@ export default function Properties() {
     p.name.toLowerCase().includes(search.toLowerCase()) ||
     p.address.toLowerCase().includes(search.toLowerCase())
   )
+
+  const remove = async (id: string) => {
+    if (!window.confirm('Eliminar esta propiedad?')) return
+    setDeletingId(id)
+    const res = await fetch(`/api/properties?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+    if (res.ok) setProperties(current => current.filter(p => p.id !== id))
+    setDeletingId(null)
+  }
+
+  if (selectedProperty) {
+    return (
+      <PropertyDetail
+        property={selectedProperty.property}
+        imageUrl={selectedProperty.imageUrl}
+        onBack={() => setSelectedProperty(null)}
+        onSaved={(updated) => {
+          setProperties(current => current.map(property => property.id === updated.id ? updated : property))
+          setSelectedProperty({ property: updated, imageUrl: selectedProperty.imageUrl })
+        }}
+      />
+    )
+  }
 
   return (
     <div className="px-6 py-4">
@@ -102,7 +127,11 @@ export default function Properties() {
       ) : (
         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((p, idx) => (
-            <div key={p.id} className="bg-white border border-outline-variant rounded-xl overflow-hidden group hover:shadow-lg transition-all cursor-pointer">
+            <div
+              key={p.id}
+              onClick={() => setSelectedProperty({ property: p, imageUrl: p.image_url || PLACEHOLDER_IMAGES[idx % PLACEHOLDER_IMAGES.length] })}
+              className="bg-white border border-outline-variant rounded-xl overflow-hidden group hover:shadow-lg transition-all cursor-pointer"
+            >
               <div className="h-52 relative overflow-hidden">
                 <img
                   src={p.image_url || PLACEHOLDER_IMAGES[idx % PLACEHOLDER_IMAGES.length]}
@@ -114,6 +143,14 @@ export default function Properties() {
                     {STATUS_LABELS[p.status] || p.status}
                   </span>
                 </div>
+                <button
+                  onClick={(event) => { event.stopPropagation(); remove(p.id) }}
+                  disabled={deletingId === p.id}
+                  className="absolute top-3 left-3 w-9 h-9 bg-white/95 text-error rounded-full flex items-center justify-center hover:bg-error hover:text-white transition-colors"
+                  title="Eliminar propiedad"
+                >
+                  <span className="material-symbols-outlined text-[18px]">{deletingId === p.id ? 'hourglass_top' : 'delete'}</span>
+                </button>
               </div>
               <div className="p-5">
                 <div className="flex justify-between items-start mb-2">
@@ -153,7 +190,7 @@ export default function Properties() {
         </section>
       )}
 
-      {showAdd && <AddPropertyModal onClose={() => setShowAdd(false)} onSaved={() => { setShowAdd(false); load(filter) }} />}
+      {showAdd && <AddPropertyModal onClose={() => setShowAdd(false)} onSaved={(property) => { setShowAdd(false); setProperties(current => [property, ...current]) }} />}
     </div>
   )
 }

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import type { Provider } from '@/lib/supabase'
+import type { Provider } from '@/lib/db'
+import AddProviderModal from './AddProviderModal'
 
 const PLACEHOLDER_AVATARS = [
   'https://lh3.googleusercontent.com/aida-public/AB6AXuBzVvkYigU0AYyYm65nbljTG3G8dAyNcbdyiBagjvY08qtk9xhy8A6WEXwEZ9iakwpFgcV4et6hDXkV2oA__KMEPm_5jEdAwrfbgXoi69GRKbozRwLbNSeYUmCiVXmGVhL5so-aGSZ0QmZ_u2kI6Q1KK1VHI4ew3obLvdLkkmC2v6RnOpeXitMbYWo5DIplMYsQhnwgi3wxfGhtY9Na50c85e7rYj9icHNvQRNXLF7CB6jPK8ijz27xHA',
@@ -13,6 +14,8 @@ export default function Providers() {
   const [providers, setProviders] = useState<Provider[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [showAdd, setShowAdd] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     fetch('/api/providers')
@@ -26,16 +29,33 @@ export default function Providers() {
     p.category.toLowerCase().includes(search.toLowerCase())
   )
 
+  const remove = async (id: string) => {
+    if (!window.confirm('Eliminar este proveedor?')) return
+    setDeletingId(id)
+    const res = await fetch(`/api/providers?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+    if (res.ok) setProviders(current => current.filter(p => p.id !== id))
+    setDeletingId(null)
+  }
+
   return (
     <div className="px-6 py-4">
-      <div className="relative mb-4">
-        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
-        <input
-          className="w-full h-12 pl-12 pr-4 bg-white border border-outline-variant rounded-lg outline-none focus:border-primary text-base"
-          placeholder="Buscar proveedores..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
+      <div className="flex flex-col md:flex-row gap-4 mb-4">
+        <div className="relative flex-grow">
+          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+          <input
+            className="w-full h-12 pl-12 pr-4 bg-white border border-outline-variant rounded-lg outline-none focus:border-primary text-base"
+            placeholder="Buscar proveedores..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+        <button
+          onClick={() => setShowAdd(true)}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:opacity-90 font-semibold text-[11px] tracking-wider"
+        >
+          <span className="material-symbols-outlined text-lg">add</span>
+          AGREGAR
+        </button>
       </div>
 
       {loading ? (
@@ -77,11 +97,20 @@ export default function Providers() {
                 <button className="flex-1 h-10 bg-primary text-white rounded-lg flex items-center justify-center text-[11px] font-bold tracking-wider hover:opacity-90">
                   Ver Perfil
                 </button>
+                <button
+                  onClick={() => remove(p.id)}
+                  disabled={deletingId === p.id}
+                  className="w-10 h-10 border border-error-container text-error rounded-lg flex items-center justify-center hover:bg-error hover:text-white disabled:opacity-50"
+                  title="Eliminar proveedor"
+                >
+                  <span className="material-symbols-outlined text-lg">{deletingId === p.id ? 'hourglass_top' : 'delete'}</span>
+                </button>
               </div>
             </div>
           ))}
         </div>
       )}
+      {showAdd && <AddProviderModal onClose={() => setShowAdd(false)} onSaved={(provider) => { setShowAdd(false); setProviders(current => [provider, ...current]) }} />}
     </div>
   )
 }

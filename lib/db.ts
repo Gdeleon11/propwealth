@@ -1,24 +1,28 @@
-import { createClient } from '@supabase/supabase-js'
+import { neon } from '@neondatabase/serverless'
 
-// Lazy client — only instantiated at runtime when env vars are available
-let _client: ReturnType<typeof createClient> | null = null
+// Lazy SQL client — created once per serverless instance
+let _sql: ReturnType<typeof neon> | null = null
 
-export function getSupabase() {
-  if (!_client) {
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    if (!url || !key) throw new Error('Missing Supabase env vars')
-    _client = createClient(url, key)
+export function getDb() {
+  if (!_sql) {
+    const url = process.env.DATABASE_URL
+    if (!url) throw new Error('Missing DATABASE_URL environment variable')
+    _sql = neon(url)
   }
-  return _client
+  return _sql
 }
 
-// Convenience alias
-export const supabase = {
-  get from() { return getSupabase().from.bind(getSupabase()) }
+// Typed query helper — avoids TS issues with neon's tagged template union return type
+export async function query<T = Record<string, unknown>>(
+  sql: ReturnType<typeof neon>,
+  strings: TemplateStringsArray,
+  ...values: unknown[]
+): Promise<T[]> {
+  const result = await sql(strings, ...values)
+  return result as unknown as T[]
 }
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export type Property = {
   id: string
@@ -38,7 +42,7 @@ export type Property = {
 
 export type Tenant = {
   id: string
-  property_id: string
+  property_id: string | null
   full_name: string
   email: string
   phone: string | null
@@ -47,7 +51,8 @@ export type Tenant = {
   payment_status: 'paid' | 'pending' | 'overdue'
   avatar_url: string | null
   created_at: string
-  property?: Property
+  property_name?: string
+  property_address?: string
 }
 
 export type Provider = {

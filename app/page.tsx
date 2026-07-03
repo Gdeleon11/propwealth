@@ -1,40 +1,60 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import Dashboard from '@/components/Dashboard'
 import Properties from '@/components/Properties'
-import Tenants from '@/components/Tenants'
 import Reports from '@/components/Reports'
 import Settings from '@/components/Settings'
-import Providers from '@/components/Providers'
+import Activity from '@/components/Activity'
+import Calendar from '@/components/Calendar'
 
-type Screen = 'dashboard' | 'properties' | 'payments' | 'reports' | 'settings'
+type Screen = 'dashboard' | 'calendar' | 'properties' | 'payments' | 'reports' | 'settings' | 'activity'
+
+const navItems: { id: Screen; icon: string; label: string }[] = [
+  { id: 'dashboard', icon: 'dashboard', label: 'Dashboard' },
+  { id: 'calendar', icon: 'calendar_month', label: 'Calendario' },
+  { id: 'properties', icon: 'domain', label: 'Propiedades' },
+  { id: 'payments', icon: 'payments', label: 'Pagos' },
+  { id: 'reports', icon: 'analytics', label: 'Reportes' },
+  { id: 'settings', icon: 'settings', label: 'Ajustes' },
+]
 
 export default function Home() {
   const [screen, setScreen] = useState<Screen>('dashboard')
 
-  const navItems: { id: Screen; icon: string; label: string }[] = [
-    { id: 'dashboard', icon: 'dashboard', label: 'Dashboard' },
-    { id: 'properties', icon: 'domain', label: 'Propiedades' },
-    { id: 'payments', icon: 'payments', label: 'Pagos' },
-    { id: 'reports', icon: 'analytics', label: 'Reportes' },
-    { id: 'settings', icon: 'settings', label: 'Ajustes' },
-  ]
+  useEffect(() => {
+    const setFromHash = () => {
+      const next = window.location.hash.replace('#', '') as Screen
+      if (next === 'activity' || navItems.some((item) => item.id === next)) setScreen(next)
+    }
+    setFromHash()
+    window.addEventListener('hashchange', setFromHash)
+    return () => window.removeEventListener('hashchange', setFromHash)
+  }, [])
 
   const renderScreen = () => {
     switch (screen) {
-      case 'dashboard': return <Dashboard />
-      case 'properties': return <Properties />
-      case 'payments': return <Tenants />
-      case 'reports': return <Reports />
-      case 'settings': return <Settings />
-      default: return <Dashboard />
+      case 'dashboard':
+        return <Dashboard onViewActivity={() => { setScreen('activity'); window.location.hash = 'activity' }} />
+      case 'calendar':
+        return <Calendar />
+      case 'properties':
+        return <Properties />
+      case 'payments':
+        return <Activity onBack={() => { setScreen('dashboard'); window.location.hash = 'dashboard' }} />
+      case 'reports':
+        return <Reports />
+      case 'settings':
+        return <Settings />
+      case 'activity':
+        return <Activity onBack={() => { setScreen('dashboard'); window.location.hash = 'dashboard' }} />
+      default:
+        return <Dashboard />
     }
   }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Top App Bar */}
       <header className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-2">
           <div className="flex items-center gap-3">
@@ -54,33 +74,33 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="pt-16 pb-20 max-w-7xl mx-auto">
         {renderScreen()}
       </main>
 
-      {/* Bottom Navigation */}
       <nav className="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-primary border-t border-outline-variant shadow-sm">
         {navItems.map((item) => {
           const isActive = screen === item.id
           return (
-            <button
+            <a
               key={item.id}
+              href={`#${item.id}`}
               onClick={() => setScreen(item.id)}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg transition-all ${
-                isActive
-                  ? 'text-secondary-fixed font-bold'
-                  : 'text-on-primary opacity-70 hover:opacity-100'
+              className={`flex flex-col items-center justify-center py-1 px-3 rounded-lg transition-all min-w-0 ${
+                isActive ? 'text-secondary-fixed font-bold' : 'text-on-primary opacity-70 hover:opacity-100'
               }`}
             >
               <span
-                className="material-symbols-outlined"
-                style={{ fontVariationSettings: isActive ? "'FILL' 1" : "'FILL' 0" }}
+                className="material-symbols-outlined text-[20px] leading-none"
+                style={{
+                  fontFamily: '"Material Symbols Outlined"',
+                  fontVariationSettings: isActive ? "'FILL' 1, 'wght' 700, 'GRAD' 0, 'opsz' 24" : "'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24",
+                }}
               >
                 {item.icon}
               </span>
-              <span className="text-[10px] font-semibold tracking-wide mt-0.5">{item.label}</span>
-            </button>
+              <span className="text-[10px] font-semibold tracking-wide mt-0.5 leading-none whitespace-nowrap">{item.label}</span>
+            </a>
           )
         })}
       </nav>

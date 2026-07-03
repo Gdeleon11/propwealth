@@ -24,7 +24,11 @@ function fmt(n: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
 }
 
-export default function Dashboard() {
+type Props = {
+  onViewActivity?: () => void
+}
+
+export default function Dashboard({ onViewActivity }: Props) {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -163,7 +167,10 @@ export default function Dashboard() {
               )}
             </div>
           )}
-          <button className="w-full mt-3 py-2 text-primary border border-primary text-[11px] font-bold tracking-wider hover:bg-primary hover:text-white transition-all rounded">
+          <button
+            onClick={onViewActivity}
+            className="w-full mt-3 py-2 text-primary border border-primary text-[11px] font-bold tracking-wider hover:bg-primary hover:text-white transition-all rounded"
+          >
             VER TODA LA ACTIVIDAD
           </button>
         </div>

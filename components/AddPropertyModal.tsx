@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import type { Property } from '@/lib/db'
 
-type Props = { onClose: () => void; onSaved: () => void }
+type Props = { onClose: () => void; onSaved: (property: Property) => void }
 
 export default function AddPropertyModal({ onClose, onSaved }: Props) {
   const [form, setForm] = useState({
@@ -23,8 +24,9 @@ export default function AddPropertyModal({ onClose, onSaved }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     })
-    if (res.ok) { onSaved() }
-    else { const d = await res.json(); setError(d.error || 'Error al guardar'); setSaving(false) }
+    const data = await res.json()
+    if (res.ok) { onSaved(data) }
+    else { setError(data.error || 'Error al guardar'); setSaving(false) }
   }
 
   return (

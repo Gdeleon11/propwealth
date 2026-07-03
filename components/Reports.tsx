@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import type { Property } from '@/lib/db'
 
 type DashData = {
   totalPortfolioValue: number
@@ -16,14 +17,26 @@ function fmt(n: number) {
 
 export default function Reports() {
   const [data, setData] = useState<DashData | null>(null)
+  const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/dashboard')
-      .then(r => r.json())
-      .then(d => { setData(d); setLoading(false) })
+    Promise.all([
+      fetch('/api/dashboard').then(r => r.json()),
+      fetch('/api/properties').then(r => r.json()),
+    ])
+      .then(([dashboard, propertyRows]) => {
+        setData(dashboard)
+        setProperties(Array.isArray(propertyRows) ? propertyRows : [])
+        setLoading(false)
+      })
       .catch(() => setLoading(false))
   }, [])
+
+  const topRoi = [...properties]
+    .sort((a, b) => Number(b.roi_pct || 0) - Number(a.roi_pct || 0))
+    .slice(0, 5)
+  const maxRoi = Math.max(...topRoi.map(p => Number(p.roi_pct || 0)), 1)
 
   return (
     <div className="px-6 py-4 space-y-4">
@@ -50,10 +63,17 @@ export default function Reports() {
           <span className="material-symbols-outlined text-outline cursor-pointer">more_vert</span>
         </div>
         <div className="h-52 flex items-end justify-between px-4 pt-4 gap-2">
-          {[['SKYLINE TOWER','92%','12.4%'],['OAKWOOD PLAZA','84%','10.8%'],['METRO HUB','100%','13.2%'],['HARBOR LOFTS','76%','9.4%'],['ZENITH PARK','68%','8.2%']].map(([name, h, roi]) => (
-            <div key={name} className="flex flex-col items-center gap-2 flex-1 cursor-pointer group">
-              <div className={`w-full rounded-t-lg ${name === 'METRO HUB' ? 'bg-primary' : 'bg-primary-container'}`} style={{ height: h }}/>
-              <span className="text-[9px] font-semibold tracking-wide text-on-surface-variant text-center leading-tight">{name}<br/>{roi}</span>
+          {(topRoi.length ? topRoi : [
+            { id: 'empty-1', name: 'Sin datos', roi_pct: 0 },
+          ] as Partial<Property>[]).map((property, index) => (
+            <div key={property.id || property.name} className="flex flex-col items-center gap-2 flex-1 cursor-pointer group">
+              <div
+                className={`w-full rounded-t-lg ${index === 0 ? 'bg-primary' : 'bg-primary-container'}`}
+                style={{ height: `${Math.max(8, (Number(property.roi_pct || 0) / maxRoi) * 100)}%` }}
+              />
+              <span className="text-[9px] font-semibold tracking-wide text-on-surface-variant text-center leading-tight">
+                {property.name}<br/>{Number(property.roi_pct || 0).toFixed(1)}%
+              </span>
             </div>
           ))}
         </div>
