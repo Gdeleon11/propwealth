@@ -35,14 +35,23 @@ export default function Dashboard({ onViewActivity }: Props) {
   const [aiLoading, setAiLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/dashboard')
+    const loadDashboard = () => fetch('/api/dashboard')
       .then(r => r.json())
       .then(d => { setData(d); setLoading(false) })
       .catch(() => setLoading(false))
-    fetch('/api/ai-insights')
+
+    // Genera la renta del mes (si aplica) y luego carga el dashboard
+    fetch('/api/rent/sync', { method: 'POST' }).catch(() => {}).finally(loadDashboard)
+
+    // Análisis IA con timeout para que no se quede cargando indefinidamente
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 22000)
+    fetch('/api/ai-insights', { signal: controller.signal })
       .then(r => r.json())
       .then(d => { setAi(d); setAiLoading(false) })
-      .catch(() => setAiLoading(false))
+      .catch(() => { setAi({ title: 'Análisis no disponible', insight: 'No se pudo generar el análisis ahora. Revisa que GROQ_API_KEY esté configurada en Vercel e inténtalo de nuevo.' }); setAiLoading(false) })
+      .finally(() => clearTimeout(timer))
+    return () => { clearTimeout(timer); controller.abort() }
   }, [])
 
   const kpis = data ? [

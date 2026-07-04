@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { Property } from '@/lib/db'
+import { formatMoney } from '@/lib/format'
 import AddPropertyModal from './AddPropertyModal'
 import PropertyDetail from './PropertyDetail'
 
@@ -158,7 +159,7 @@ export default function Properties() {
                   <div className="text-right ml-2 flex-shrink-0">
                     <span className="block text-[11px] font-semibold tracking-wider text-outline uppercase">Renta Mensual</span>
                     <span className="block text-[26px] font-bold leading-tight text-primary">
-                      ${Number(p.monthly_rent || 0).toLocaleString()}
+                      {formatMoney(Number(p.monthly_rent || 0))}
                     </span>
                   </div>
                 </div>
@@ -180,7 +181,7 @@ export default function Properties() {
                     </div>
                     <div className="text-right">
                       <span className="block text-[11px] font-semibold tracking-wider text-outline uppercase mb-1">Flujo</span>
-                      <span className="text-sm font-bold text-primary">${Number(p.cash_flow || 0).toLocaleString()}</span>
+                      <span className="text-sm font-bold text-primary">{formatMoney(Number(p.cash_flow || 0))}</span>
                     </div>
                   </div>
                 </div>

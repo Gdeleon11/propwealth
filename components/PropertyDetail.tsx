@@ -118,10 +118,9 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: assignId, property_id: property.id }),
     })
-    // Si la propiedad está rentada y tiene renta, registramos el ingreso del mes
-    const rent = Number(form.monthly_rent) || 0
-    if (form.status === 'rented' && rent > 0) {
-      await addTransaction({ type: 'income', entity: `Renta · ${form.name}`, amount: rent, tenant_id: assignId })
+    // Si la propiedad está rentada, generamos la renta del mes (idempotente)
+    if (form.status === 'rented') {
+      await fetch('/api/rent/sync', { method: 'POST' }).catch(() => {})
     }
     setAssignId('')
     loadTenants()

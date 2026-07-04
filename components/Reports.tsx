@@ -10,6 +10,7 @@ type DashData = {
   avgRoi: number
   occupancyRate: number
   delinquencyRate?: number
+  totalIncome?: number
   totalExpenses?: number
   monthly?: { month: string; income: number; expense: number }[]
   expenseBreakdown?: { label: string; amount: number; pct: number }[]
@@ -45,6 +46,10 @@ export default function Reports() {
   const maxCash = Math.max(...monthly.flatMap(m => [m.income, m.expense]), 1)
   const expenseBreakdown = data?.expenseBreakdown || []
   const totalExpenses = data?.totalExpenses || 0
+  const totalIncome = data?.totalIncome || 0
+  const netTotal = totalIncome - totalExpenses
+  const incExpTotal = totalIncome + totalExpenses
+  const incomePct = incExpTotal > 0 ? (totalIncome / incExpTotal) * 100 : 0
   const delinquencyRate = data?.delinquencyRate || 0
 
   // Puntos para las líneas de flujo de caja (ingresos y gastos) en un viewBox 0..100
@@ -95,40 +100,47 @@ export default function Reports() {
       </section>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-        {/* Expense Breakdown */}
+        {/* Ingresos vs Egresos */}
         <section className="md:col-span-4 bg-white border border-outline-variant p-4 rounded-xl card-shadow">
-          <h3 className="text-[11px] font-bold tracking-widest text-primary uppercase mb-4">DESGLOSE DE GASTOS</h3>
-          {expenseBreakdown.length === 0 ? (
-            <div className="py-10 text-center text-sm text-on-surface-variant">Sin gastos registrados aún</div>
+          <h3 className="text-[11px] font-bold tracking-widest text-primary uppercase mb-4">INGRESOS VS EGRESOS</h3>
+          {incExpTotal === 0 ? (
+            <div className="py-10 text-center text-sm text-on-surface-variant">Sin movimientos registrados aún</div>
           ) : (
             <>
               <div className="relative flex justify-center items-center py-4">
                 <div
                   className="w-36 h-36 rounded-full flex flex-col items-center justify-center relative"
-                  style={{
-                    background: `conic-gradient(${expenseBreakdown
-                      .map((e, i, arr) => {
-                        const start = arr.slice(0, i).reduce((s, x) => s + x.pct, 0)
-                        const colors = ['#006e25', '#3f6b3f', '#88b088', '#c9c9c9', '#a8d0a8']
-                        return `${colors[i % colors.length]} ${start}% ${start + e.pct}%`
-                      })
-                      .join(', ')})`,
-                  }}
+                  style={{ background: `conic-gradient(#006e25 0% ${incomePct}%, #ba1a1a ${incomePct}% 100%)` }}
                 >
                   <div className="w-24 h-24 rounded-full bg-white flex flex-col items-center justify-center">
-                    <span className="text-[10px] font-semibold text-on-surface-variant">TOTAL</span>
-                    <span className="text-[20px] font-bold">{fmtK(totalExpenses)}</span>
+                    <span className="text-[10px] font-semibold text-on-surface-variant">NETO</span>
+                    <span className={`text-[18px] font-bold ${netTotal >= 0 ? 'text-secondary' : 'text-error'}`}>{fmtK(netTotal)}</span>
                   </div>
                 </div>
               </div>
               <ul className="space-y-2 mt-2">
-                {expenseBreakdown.map((e, i) => (
-                  <li key={e.label} className="flex justify-between items-center text-base">
-                    <span className="flex items-center gap-2"><div className={`w-3 h-3 rounded-sm ${DONUT_COLORS[i % DONUT_COLORS.length]}`}/>{e.label}</span>
-                    <span className="font-bold">{e.pct}%</span>
-                  </li>
-                ))}
+                <li className="flex justify-between items-center text-base">
+                  <span className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-secondary"/>Ingresos</span>
+                  <span className="font-bold text-secondary">{fmt(totalIncome)}</span>
+                </li>
+                <li className="flex justify-between items-center text-base">
+                  <span className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm bg-error"/>Egresos</span>
+                  <span className="font-bold text-error">{fmt(totalExpenses)}</span>
+                </li>
               </ul>
+              {expenseBreakdown.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-surface-variant">
+                  <p className="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-2">Desglose de gastos</p>
+                  <ul className="space-y-1">
+                    {expenseBreakdown.map((e, i) => (
+                      <li key={e.label} className="flex justify-between items-center text-sm">
+                        <span className="flex items-center gap-2"><div className={`w-2.5 h-2.5 rounded-sm ${DONUT_COLORS[i % DONUT_COLORS.length]}`}/>{e.label}</span>
+                        <span className="font-semibold">{e.pct}%</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </>
           )}
         </section>

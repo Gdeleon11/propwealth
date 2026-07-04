@@ -103,7 +103,8 @@ export default function Activity({ onBack }: Props) {
   }
 
   useEffect(() => {
-    loadTransactions()
+    // Genera la renta del mes (si aplica) antes de listar
+    fetch('/api/rent/sync', { method: 'POST' }).catch(() => {}).finally(loadTransactions)
   }, [])
 
   const filtered = useMemo(() => {
