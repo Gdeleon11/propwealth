@@ -26,7 +26,7 @@ function getActivityFromTransactions(transactions: any[]): ActivityItem[] {
     meta: new Date(t.created_at).toLocaleString('es'),
     icon: t.type === 'income' ? 'check_circle' : 'remove',
     tone: t.status === 'processed' ? 'success' : t.type === 'income' ? 'success' : 'warning',
-    amount: `${t.type === 'income' ? '+' : '-'}$${t.amount.toFixed(2)}`,
+    amount: `${t.type === 'income' ? '+' : '-'}$${Number(t.amount || 0).toFixed(2)}`,
   }))
 }
 

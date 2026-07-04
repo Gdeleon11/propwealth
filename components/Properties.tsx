@@ -158,7 +158,7 @@ export default function Properties() {
                   <div className="text-right ml-2 flex-shrink-0">
                     <span className="block text-[11px] font-semibold tracking-wider text-outline uppercase">Renta Mensual</span>
                     <span className="block text-[26px] font-bold leading-tight text-primary">
-                      ${p.monthly_rent.toLocaleString()}
+                      ${Number(p.monthly_rent || 0).toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -180,7 +180,7 @@ export default function Properties() {
                     </div>
                     <div className="text-right">
                       <span className="block text-[11px] font-semibold tracking-wider text-outline uppercase mb-1">Flujo</span>
-                      <span className="text-sm font-bold text-primary">${p.cash_flow.toLocaleString()}</span>
+                      <span className="text-sm font-bold text-primary">${Number(p.cash_flow || 0).toLocaleString()}</span>
                     </div>
                   </div>
                 </div>

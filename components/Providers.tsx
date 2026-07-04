@@ -83,7 +83,7 @@ export default function Providers() {
                 </div>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   <span className="material-symbols-outlined text-tertiary-fixed-dim text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
-                  <span className="text-sm font-bold">{p.rating.toFixed(1)}</span>
+                  <span className="text-sm font-bold">{Number(p.rating || 0).toFixed(1)}</span>
                 </div>
               </div>
               <div className="flex items-center gap-2 text-on-surface-variant">
