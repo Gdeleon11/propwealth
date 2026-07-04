@@ -7,6 +7,9 @@ declare module "next-auth" {
       name?: string | null
       email?: string | null
       image?: string | null
+      preferred_language?: string
+      currency?: string
+      timezone?: string
     }
   }
 
@@ -15,5 +18,8 @@ declare module "next-auth" {
     name?: string | null
     email?: string | null
     image?: string | null
+    preferred_language?: string
+    currency?: string
+    timezone?: string
   }
 }

@@ -47,12 +47,17 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       if (session.user && session.user.email) {
-        const user = await getUser(session.user.email)
+        const user = await getUser(session.user.email);
         if (user) {
-          (session.user as any).id = user.id
+          (session.user as any).id = user.id;
+          (session.user as any).name = user.name || session.user.name;
+          (session.user as any).image = user.image || session.user.image;
+          (session.user as any).preferred_language = user.preferred_language || 'es';
+          (session.user as any).currency = user.currency || 'USD';
+          (session.user as any).timezone = user.timezone || 'America/Mexico_City';
         }
       }
-      return session
+      return session;
     },
   },
 })

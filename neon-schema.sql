@@ -3,6 +3,23 @@
 -- Pegar completo en: Neon Console > SQL Editor
 -- ============================================================
 
+-- USERS
+CREATE TABLE IF NOT EXISTS users (
+  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  email            TEXT        NOT NULL UNIQUE,
+  name             TEXT,
+  image            TEXT,
+  google_id        TEXT,
+  preferred_language TEXT        NOT NULL DEFAULT 'es',
+  currency         TEXT        NOT NULL DEFAULT 'USD',
+  timezone         TEXT        NOT NULL DEFAULT 'America/Mexico_City',
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
+
 -- PROPERTIES
 CREATE TABLE IF NOT EXISTS properties (
   id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),

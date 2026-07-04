@@ -1,5 +1,25 @@
 -- PropWealth Database Schema
--- Tables: properties, tenants, providers, transactions
+-- Tables: users, properties, tenants, providers, transactions
+
+-- ============================================
+-- TABLE: users
+-- Stores user account information and preferences
+-- ============================================
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email VARCHAR(255) NOT NULL UNIQUE,
+  name VARCHAR(255),
+  image TEXT,
+  google_id VARCHAR(255),
+  preferred_language VARCHAR(10) NOT NULL DEFAULT 'es',
+  currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+  timezone VARCHAR(100) NOT NULL DEFAULT 'America/Mexico_City',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
 
 -- ============================================
 -- TABLE: properties
