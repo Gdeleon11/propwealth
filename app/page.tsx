@@ -4,17 +4,20 @@ import { useEffect, useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import Dashboard from '@/components/Dashboard'
 import Properties from '@/components/Properties'
+import Tenants from '@/components/Tenants'
+import Providers from '@/components/Providers'
 import Reports from '@/components/Reports'
 import Settings from '@/components/Settings'
 import Activity from '@/components/Activity'
 import Calendar from '@/components/Calendar'
 
-type Screen = 'dashboard' | 'calendar' | 'properties' | 'payments' | 'reports' | 'settings' | 'activity'
+type Screen = 'dashboard' | 'calendar' | 'properties' | 'tenants' | 'providers' | 'payments' | 'reports' | 'settings' | 'activity'
 
 const navItems: { id: Screen; icon: string; label: string }[] = [
   { id: 'dashboard', icon: 'dashboard', label: 'Dashboard' },
-  { id: 'calendar', icon: 'calendar_month', label: 'Calendario' },
   { id: 'properties', icon: 'domain', label: 'Propiedades' },
+  { id: 'tenants', icon: 'group', label: 'Inquilinos' },
+  { id: 'providers', icon: 'handyman', label: 'Proveedores' },
   { id: 'payments', icon: 'payments', label: 'Pagos' },
   { id: 'reports', icon: 'analytics', label: 'Reportes' },
   { id: 'settings', icon: 'settings', label: 'Ajustes' },
@@ -47,6 +50,10 @@ export default function Home() {
         return <Calendar />
       case 'properties':
         return <Properties />
+      case 'tenants':
+        return <Tenants />
+      case 'providers':
+        return <Providers />
       case 'payments':
         return <Activity onBack={() => { setScreen('dashboard'); window.location.hash = 'dashboard' }} />
       case 'reports':

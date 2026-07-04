@@ -8,12 +8,23 @@ type DashData = {
   monthlyIncome: number
   avgRoi: number
   occupancyRate: number
+  delinquencyRate?: number
+  totalExpenses?: number
+  monthly?: { month: string; income: number; expense: number }[]
+  expenseBreakdown?: { label: string; amount: number; pct: number }[]
   recentTransactions: { entity: string; type: string; amount: number; status: string; created_at: string }[]
 }
 
 function fmt(n: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
 }
+
+function fmtK(n: number) {
+  if (n >= 1000) return `$${(n / 1000).toFixed(1)}k`
+  return `$${n.toFixed(0)}`
+}
+
+const DONUT_COLORS = ['bg-primary', 'bg-secondary', 'bg-primary-fixed-dim', 'bg-outline-variant', 'bg-tertiary-container']
 
 export default function Reports() {
   const [data, setData] = useState<DashData | null>(null)
@@ -38,6 +49,20 @@ export default function Reports() {
     .slice(0, 5)
   const maxRoi = Math.max(...topRoi.map(p => Number(p.roi_pct || 0)), 1)
 
+  const monthly = data?.monthly || []
+  const maxCash = Math.max(...monthly.flatMap(m => [m.income, m.expense]), 1)
+  const expenseBreakdown = data?.expenseBreakdown || []
+  const totalExpenses = data?.totalExpenses || 0
+  const delinquencyRate = data?.delinquencyRate || 0
+
+  // Puntos para la línea de flujo de caja (ingresos) escalados a un viewBox 0..100
+  const cashPoints = monthly.map((m, i) => {
+    const x = monthly.length > 1 ? (i / (monthly.length - 1)) * 1000 : 0
+    const y = 100 - (m.income / maxCash) * 80
+    return `${x.toFixed(0)},${y.toFixed(1)}`
+  })
+  const cashLine = cashPoints.join(' ')
+
   return (
     <div className="px-6 py-4 space-y-4">
       {/* Summary cards */}
@@ -45,8 +70,8 @@ export default function Reports() {
         <div className="bg-white border border-outline-variant p-4 rounded-xl card-shadow">
           <span className="text-[11px] font-bold tracking-widest text-on-surface-variant uppercase">PORTAFOLIO DE INVERSIÓN TOTAL</span>
           <div className="text-[26px] font-bold mt-2 text-primary">{loading ? '—' : fmt(data?.totalPortfolioValue || 0)}</div>
-          <div className="mt-3 flex items-center gap-1 text-secondary text-[11px] font-bold">
-            <span className="material-symbols-outlined text-[13px]">trending_up</span>+4.2% ANUAL
+          <div className="mt-3 flex items-center gap-1 text-on-surface-variant text-[11px] font-bold">
+            <span className="material-symbols-outlined text-[13px]">domain</span>{properties.length} PROPIEDADES
           </div>
         </div>
         <div className="bg-white border border-outline-variant p-4 rounded-xl card-shadow">
@@ -83,22 +108,39 @@ export default function Reports() {
         {/* Expense Breakdown */}
         <section className="md:col-span-4 bg-white border border-outline-variant p-4 rounded-xl card-shadow">
           <h3 className="text-[11px] font-bold tracking-widest text-primary uppercase mb-4">DESGLOSE DE GASTOS</h3>
-          <div className="relative flex justify-center items-center py-4">
-            <div className="w-36 h-36 rounded-full border-[12px] border-surface-container-high flex flex-col items-center justify-center relative">
-              <div className="absolute inset-0 rounded-full border-[12px] border-primary border-t-transparent border-l-transparent border-r-transparent rotate-45"/>
-              <div className="absolute inset-0 rounded-full border-[12px] border-secondary border-b-transparent border-l-transparent border-r-transparent -rotate-12"/>
-              <span className="text-[10px] font-semibold text-on-surface-variant">TOTAL</span>
-              <span className="text-[20px] font-bold">$42.8k</span>
-            </div>
-          </div>
-          <ul className="space-y-2 mt-2">
-            {[['bg-primary','Servicios','50%'],['bg-secondary','Mantenimiento','25%'],['bg-primary-fixed-dim','Administración','15%'],['bg-outline-variant','Impuestos','10%']].map(([color, label, pct]) => (
-              <li key={label} className="flex justify-between items-center text-base">
-                <span className="flex items-center gap-2"><div className={`w-3 h-3 rounded-sm ${color}`}/>{label}</span>
-                <span className="font-bold">{pct}</span>
-              </li>
-            ))}
-          </ul>
+          {expenseBreakdown.length === 0 ? (
+            <div className="py-10 text-center text-sm text-on-surface-variant">Sin gastos registrados aún</div>
+          ) : (
+            <>
+              <div className="relative flex justify-center items-center py-4">
+                <div
+                  className="w-36 h-36 rounded-full flex flex-col items-center justify-center relative"
+                  style={{
+                    background: `conic-gradient(${expenseBreakdown
+                      .map((e, i, arr) => {
+                        const start = arr.slice(0, i).reduce((s, x) => s + x.pct, 0)
+                        const colors = ['#006e25', '#3f6b3f', '#88b088', '#c9c9c9', '#a8d0a8']
+                        return `${colors[i % colors.length]} ${start}% ${start + e.pct}%`
+                      })
+                      .join(', ')})`,
+                  }}
+                >
+                  <div className="w-24 h-24 rounded-full bg-white flex flex-col items-center justify-center">
+                    <span className="text-[10px] font-semibold text-on-surface-variant">TOTAL</span>
+                    <span className="text-[20px] font-bold">{fmtK(totalExpenses)}</span>
+                  </div>
+                </div>
+              </div>
+              <ul className="space-y-2 mt-2">
+                {expenseBreakdown.map((e, i) => (
+                  <li key={e.label} className="flex justify-between items-center text-base">
+                    <span className="flex items-center gap-2"><div className={`w-3 h-3 rounded-sm ${DONUT_COLORS[i % DONUT_COLORS.length]}`}/>{e.label}</span>
+                    <span className="font-bold">{e.pct}%</span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
         </section>
 
         {/* Cash Flow SVG */}
@@ -110,23 +152,29 @@ export default function Reports() {
               <div className="flex items-center gap-2 text-[10px] font-bold"><div className="w-2 h-2 rounded-full bg-error"/>GASTOS</div>
             </div>
           </div>
-          <div className="h-40 w-full">
-            <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 100">
-              <defs>
-                <linearGradient id="incGrad" x1="0%" x2="0%" y1="0%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#006e25', stopOpacity: 1 }}/>
-                  <stop offset="100%" style={{ stopColor: '#006e25', stopOpacity: 0 }}/>
-                </linearGradient>
-              </defs>
-              <path d="M0,80 L200,60 L400,65 L600,40 L800,45 L1000,20 L1000,100 L0,100 Z" fill="url(#incGrad)" opacity="0.1"/>
-              <path d="M0,80 L200,60 L400,65 L600,40 L800,45 L1000,20" fill="none" stroke="#006e25" strokeWidth="2" vectorEffect="non-scaling-stroke"/>
-            </svg>
-          </div>
-          <div className="flex justify-between mt-2 border-t border-outline-variant pt-2">
-            {['ENE','FEB','MAR','ABR','MAY','JUN'].map(m => (
-              <span key={m} className="text-[10px] font-semibold tracking-wider text-outline">{m}</span>
-            ))}
-          </div>
+          {monthly.length === 0 || monthly.every(m => m.income === 0 && m.expense === 0) ? (
+            <div className="h-40 flex items-center justify-center text-sm text-on-surface-variant">Sin datos de flujo de caja aún</div>
+          ) : (
+            <>
+              <div className="h-40 w-full">
+                <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 100">
+                  <defs>
+                    <linearGradient id="incGrad" x1="0%" x2="0%" y1="0%" y2="100%">
+                      <stop offset="0%" style={{ stopColor: '#006e25', stopOpacity: 1 }}/>
+                      <stop offset="100%" style={{ stopColor: '#006e25', stopOpacity: 0 }}/>
+                    </linearGradient>
+                  </defs>
+                  <polygon points={`0,100 ${cashLine} 1000,100`} fill="url(#incGrad)" opacity="0.1"/>
+                  <polyline points={cashLine} fill="none" stroke="#006e25" strokeWidth="2" vectorEffect="non-scaling-stroke"/>
+                </svg>
+              </div>
+              <div className="flex justify-between mt-2 border-t border-outline-variant pt-2">
+                {monthly.map((m, i) => (
+                  <span key={`${m.month}-${i}`} className="text-[10px] font-semibold tracking-wider text-outline">{m.month}</span>
+                ))}
+              </div>
+            </>
+          )}
         </section>
       </div>
 
@@ -145,22 +193,24 @@ export default function Reports() {
           <div className="mt-4 w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
             <div className="bg-secondary h-full" style={{ width: `${data?.occupancyRate || 0}%` }}/>
           </div>
-          <p className="mt-2 text-[12px] text-on-surface-variant">+0.8% vs trimestre anterior</p>
+          <p className="mt-2 text-[12px] text-on-surface-variant">Propiedades rentadas sobre el total</p>
         </div>
         <div className="bg-white border border-outline-variant p-4 rounded-xl card-shadow">
           <div className="flex items-center justify-between">
             <div>
               <span className="text-[11px] font-bold tracking-widest text-on-surface-variant uppercase">TASA DE MOROSIDAD</span>
-              <div className="text-[26px] font-bold mt-2 text-error">2.1%</div>
+              <div className="text-[26px] font-bold mt-2 text-error">{loading ? '—' : `${delinquencyRate}%`}</div>
             </div>
             <div className="w-16 h-16 rounded-full bg-error-container flex items-center justify-center text-on-error-container">
               <span className="material-symbols-outlined text-[32px]">warning</span>
             </div>
           </div>
           <div className="mt-4 w-full bg-surface-container-high h-2 rounded-full overflow-hidden">
-            <div className="bg-error h-full" style={{ width: '2%' }}/>
+            <div className="bg-error h-full" style={{ width: `${Math.min(100, delinquencyRate)}%` }}/>
           </div>
-          <p className="mt-2 text-[12px] text-on-surface-variant">Umbral de bajo riesgo mantenido</p>
+          <p className="mt-2 text-[12px] text-on-surface-variant">
+            {delinquencyRate === 0 ? 'Sin inquilinos en mora' : delinquencyRate < 5 ? 'Umbral de bajo riesgo' : 'Requiere atención'}
+          </p>
         </div>
       </div>
 

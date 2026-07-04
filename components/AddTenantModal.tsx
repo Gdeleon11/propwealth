@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Tenant } from '@/lib/db'
 
 type Props = { onClose: () => void; onSaved: (tenant: Tenant) => void }
@@ -10,12 +10,21 @@ export default function AddTenantModal({ onClose, onSaved }: Props) {
     full_name: '',
     email: '',
     phone: '',
+    property_id: '',
     contract_start: new Date().toISOString().split('T')[0],
     contract_end: '',
     payment_status: 'pending',
   })
+  const [properties, setProperties] = useState<{ id: string; name: string; address: string }[]>([])
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    fetch('/api/properties')
+      .then((r) => r.json())
+      .then((rows) => setProperties(Array.isArray(rows) ? rows : []))
+      .catch(() => setProperties([]))
+  }, [])
 
   const set = (key: string, value: string) => setForm((current) => ({ ...current, [key]: value }))
 
@@ -63,6 +72,18 @@ export default function AddTenantModal({ onClose, onSaved }: Props) {
               <label className="block text-[11px] font-bold tracking-widest text-on-surface-variant uppercase mb-1">TELEFONO</label>
               <input value={form.phone} onChange={(e) => set('phone', e.target.value)} className="w-full border border-outline-variant rounded-lg px-4 py-3 text-base outline-none focus:border-primary" />
             </div>
+          </div>
+          <div>
+            <label className="block text-[11px] font-bold tracking-widest text-on-surface-variant uppercase mb-1">PROPIEDAD ASIGNADA</label>
+            <select value={form.property_id} onChange={(e) => set('property_id', e.target.value)} className="w-full border border-outline-variant rounded-lg px-4 py-3 text-base outline-none focus:border-primary bg-white">
+              <option value="">Sin asignar</option>
+              {properties.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}{p.address ? ` — ${p.address}` : ''}</option>
+              ))}
+            </select>
+            {properties.length === 0 && (
+              <p className="text-[11px] text-on-surface-variant mt-1">Agrega una propiedad primero para poder asignarla.</p>
+            )}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>

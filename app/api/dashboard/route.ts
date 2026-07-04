@@ -63,7 +63,7 @@ export async function GET() {
     const [properties, tenants, transactions] = (await Promise.all([
       db`SELECT purchase_value, monthly_rent, cash_flow, roi_pct, status FROM properties WHERE user_id = ${userId}`,
       db`SELECT payment_status FROM tenants WHERE user_id = ${userId}`,
-      db`SELECT amount, type, entity, status, created_at FROM transactions WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 5`,
+      db`SELECT amount, type, entity, status, created_at FROM transactions WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 500`,
     ])) as [any[], any[], any[]]
 
     const totalPortfolioValue = properties.reduce((s: number, p: any) => s + Number(p.purchase_value || 0), 0)
@@ -77,6 +77,38 @@ export async function GET() {
     const occupancyRate    = totalProperties ? (rentedProperties / totalProperties) * 100 : 0
     const overduePayments  = tenants.filter((t: any) => t.payment_status === 'overdue').length
     const pendingPayments  = tenants.filter((t: any) => t.payment_status === 'pending').length
+    const totalTenants     = tenants.length
+    const delinquencyRate  = totalTenants ? (overduePayments / totalTenants) * 100 : 0
+
+    // Serie mensual (últimos 6 meses) de ingresos vs gastos a partir de transacciones reales
+    const now = new Date()
+    const monthly: { month: string; income: number; expense: number }[] = []
+    const monthLabels = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC']
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+      const income = transactions
+        .filter((t: any) => t.type === 'income' && new Date(t.created_at).getFullYear() === d.getFullYear() && new Date(t.created_at).getMonth() === d.getMonth())
+        .reduce((s: number, t: any) => s + Number(t.amount || 0), 0)
+      const expense = transactions
+        .filter((t: any) => t.type === 'expense' && new Date(t.created_at).getFullYear() === d.getFullYear() && new Date(t.created_at).getMonth() === d.getMonth())
+        .reduce((s: number, t: any) => s + Number(t.amount || 0), 0)
+      monthly.push({ month: monthLabels[d.getMonth()], income, expense })
+    }
+
+    // Desglose de gastos por entidad (top 4 + otros)
+    const totalIncome = transactions.filter((t: any) => t.type === 'income').reduce((s: number, t: any) => s + Number(t.amount || 0), 0)
+    const totalExpenses = transactions.filter((t: any) => t.type === 'expense').reduce((s: number, t: any) => s + Number(t.amount || 0), 0)
+    const byEntity: Record<string, number> = {}
+    transactions.filter((t: any) => t.type === 'expense').forEach((t: any) => {
+      byEntity[t.entity] = (byEntity[t.entity] || 0) + Number(t.amount || 0)
+    })
+    const sortedExpenses = Object.entries(byEntity).sort((a, b) => b[1] - a[1])
+    const topExpenses = sortedExpenses.slice(0, 4)
+    const otherSum = sortedExpenses.slice(4).reduce((s, [, v]) => s + v, 0)
+    const expenseBreakdown = [
+      ...topExpenses.map(([label, amount]) => ({ label, amount, pct: totalExpenses ? Math.round((amount / totalExpenses) * 100) : 0 })),
+      ...(otherSum > 0 ? [{ label: 'Otros', amount: otherSum, pct: totalExpenses ? Math.round((otherSum / totalExpenses) * 100) : 0 }] : []),
+    ]
 
     return NextResponse.json({
       totalPortfolioValue,
@@ -87,7 +119,12 @@ export async function GET() {
       totalProperties,
       overduePayments,
       pendingPayments,
-      recentTransactions: transactions,
+      delinquencyRate:  Number(delinquencyRate.toFixed(1)),
+      totalIncome,
+      totalExpenses,
+      monthly,
+      expenseBreakdown,
+      recentTransactions: transactions.slice(0, 5),
     })
   } catch (e: any) {
     return NextResponse.json({

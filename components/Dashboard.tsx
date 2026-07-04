@@ -11,6 +11,7 @@ type DashboardData = {
   totalProperties: number
   overduePayments: number
   pendingPayments: number
+  monthly?: { month: string; income: number; expense: number }[]
   recentTransactions: {
     entity: string
     type: string
@@ -19,6 +20,8 @@ type DashboardData = {
     created_at: string
   }[]
 }
+
+type AiInsight = { title: string; insight: string }
 
 function fmt(n: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
@@ -31,20 +34,29 @@ type Props = {
 export default function Dashboard({ onViewActivity }: Props) {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [ai, setAi] = useState<AiInsight | null>(null)
+  const [aiLoading, setAiLoading] = useState(true)
 
   useEffect(() => {
     fetch('/api/dashboard')
       .then(r => r.json())
       .then(d => { setData(d); setLoading(false) })
       .catch(() => setLoading(false))
+    fetch('/api/ai-insights')
+      .then(r => r.json())
+      .then(d => { setAi(d); setAiLoading(false) })
+      .catch(() => setAiLoading(false))
   }, [])
 
   const kpis = data ? [
-    { label: 'VALOR TOTAL DEL PORTAFOLIO', value: fmt(data.totalPortfolioValue), sub: null, bar: 75 },
-    { label: 'INGRESOS MENSUALES', value: fmt(data.monthlyIncome), sub: '+4%', bar: null },
-    { label: 'FLUJO DE CAJA NETO', value: fmt(data.netCashFlow), sub: 'RENDIMIENTO ESTABLE', bar: null },
-    { label: 'ROI GLOBAL', value: `${data.avgRoi}%`, sub: 'TOP 5%', bar: null },
+    { label: 'VALOR TOTAL DEL PORTAFOLIO', value: fmt(data.totalPortfolioValue), sub: null, bar: data.totalPortfolioValue > 0 ? 75 : 0 },
+    { label: 'INGRESOS MENSUALES', value: fmt(data.monthlyIncome), sub: null, bar: null },
+    { label: 'FLUJO DE CAJA NETO', value: fmt(data.netCashFlow), sub: null, bar: null },
+    { label: 'ROI GLOBAL', value: `${data.avgRoi}%`, sub: null, bar: null },
   ] : Array(4).fill(null)
+
+  const monthly = data?.monthly || []
+  const maxBar = Math.max(...monthly.flatMap(m => [m.income, m.expense]), 1)
 
   return (
     <div className="px-6 py-4 space-y-4">
@@ -125,17 +137,21 @@ export default function Dashboard({ onViewActivity }: Props) {
               <div className="flex items-center gap-1.5 text-[10px] font-bold"><span className="w-2 h-2 bg-outline-variant rounded-full"/> GASTOS</div>
             </div>
           </div>
-          <div className="flex items-end justify-around h-36 gap-3 pt-4">
-            {[['JUL','80%','30%'],['AGO','85%','35%'],['SEP','75%','40%'],['OCT','90%','30%'],['NOV','82%','38%'],['DIC','95%','45%']].map(([m, inc, exp]) => (
-              <div key={m} className="flex flex-col items-center flex-1 h-full">
-                <div className="w-full flex items-end justify-center gap-1 h-full">
-                  <div className="w-1/3 bg-primary rounded-t-sm" style={{ height: inc }}/>
-                  <div className="w-1/3 bg-outline-variant rounded-t-sm" style={{ height: exp }}/>
+          {monthly.length === 0 || monthly.every(m => m.income === 0 && m.expense === 0) ? (
+            <div className="h-36 flex items-center justify-center text-sm text-on-surface-variant">Sin datos de transacciones aún</div>
+          ) : (
+            <div className="flex items-end justify-around h-36 gap-3 pt-4">
+              {monthly.map((m) => (
+                <div key={m.month} className="flex flex-col items-center flex-1 h-full">
+                  <div className="w-full flex items-end justify-center gap-1 h-full">
+                    <div className="w-1/3 bg-primary rounded-t-sm" style={{ height: `${Math.max(2, (m.income / maxBar) * 100)}%` }} title={fmt(m.income)}/>
+                    <div className="w-1/3 bg-outline-variant rounded-t-sm" style={{ height: `${Math.max(2, (m.expense / maxBar) * 100)}%` }} title={fmt(m.expense)}/>
+                  </div>
+                  <span className="mt-2 text-[10px] font-semibold tracking-wider text-on-surface-variant">{m.month}</span>
                 </div>
-                <span className="mt-2 text-[10px] font-semibold tracking-wider text-on-surface-variant">{m}</span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="bg-surface-container-lowest border border-outline-variant p-4 rounded-xl card-shadow">
@@ -181,9 +197,11 @@ export default function Dashboard({ onViewActivity }: Props) {
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px,transparent 0)', backgroundSize: '24px 24px' }}/>
         <div className="relative z-10 p-6 flex flex-col h-full justify-center text-white">
           <span className="bg-secondary px-3 py-1 rounded-full text-[10px] font-bold w-fit mb-3">POTENCIADO POR IA</span>
-          <h2 className="text-2xl font-bold">Maximiza la Eficiencia de tu Portafolio</h2>
+          <h2 className="text-2xl font-bold">
+            {aiLoading ? 'Analizando tu portafolio…' : (ai?.title || 'Maximiza la Eficiencia de tu Portafolio')}
+          </h2>
           <p className="text-on-primary-container max-w-md mt-2 text-sm">
-            Análisis predictivo sugiere un aumento potencial del 1.2% en ROI ajustando términos de arrendamiento en Torre B.
+            {aiLoading ? 'La IA está revisando tus propiedades, inquilinos y movimientos.' : (ai?.insight || 'Agrega datos para recibir recomendaciones personalizadas.')}
           </p>
         </div>
         <div className="absolute right-[-5%] bottom-[-20%] w-64 h-64 opacity-20">

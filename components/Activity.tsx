@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState, useEffect } from 'react'
+import AddTransactionModal from './AddTransactionModal'
 
 type ActivityItem = {
   id: string
@@ -62,9 +63,9 @@ export default function Activity({ onBack }: Props) {
   const [filter, setFilter] = useState<(typeof filters)[number]['id']>('all')
   const [activities, setActivities] = useState<ActivityItem[]>([])
   const [loading, setLoading] = useState(true)
+  const [showAdd, setShowAdd] = useState(false)
 
-  useEffect(() => {
-    // Load transactions from API
+  const loadTransactions = () => {
     fetch('/api/transactions')
       .then(r => r.json())
       .then(data => {
@@ -73,6 +74,10 @@ export default function Activity({ onBack }: Props) {
         setLoading(false)
       })
       .catch(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    loadTransactions()
   }, [])
 
   const filtered = useMemo(() => {
@@ -157,9 +162,20 @@ export default function Activity({ onBack }: Props) {
         })}
       </div>
 
-      <button className="fixed right-6 bottom-24 w-14 h-14 bg-secondary text-white rounded-xl shadow-lg flex items-center justify-center hover:brightness-95">
+      <button
+        onClick={() => setShowAdd(true)}
+        title="Registrar movimiento"
+        className="fixed right-6 bottom-24 w-14 h-14 bg-secondary text-white rounded-xl shadow-lg flex items-center justify-center hover:brightness-95"
+      >
         <span className="material-symbols-outlined">add</span>
       </button>
+
+      {showAdd && (
+        <AddTransactionModal
+          onClose={() => setShowAdd(false)}
+          onSaved={() => { setShowAdd(false); setLoading(true); loadTransactions() }}
+        />
+      )}
     </div>
   )
 }
