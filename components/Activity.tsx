@@ -12,6 +12,7 @@ type ActivityItem = {
   tone: 'success' | 'warning' | 'neutral' | 'danger'
   amount?: string
   status?: string
+  group?: 'HOY' | 'AYER' | 'ESTA SEMANA'
 }
 
 // Transform database transactions into activity items
