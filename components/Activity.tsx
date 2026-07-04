@@ -27,6 +27,7 @@ type ActivityItem = {
   amount?: string
   status?: string
   group?: 'HOY' | 'AYER' | 'ESTA SEMANA' | 'ANTERIORES'
+  raw?: any
 }
 
 // Transform database transactions into activity items
@@ -41,6 +42,7 @@ function getActivityFromTransactions(transactions: any[]): ActivityItem[] {
     tone: (t.status === 'processed' ? 'success' : t.type === 'income' ? 'success' : 'warning') as ActivityItem['tone'],
     amount: `${t.type === 'income' ? '+' : '-'}${formatMoney(Math.abs(Number(t.amount || 0)), { maximumFractionDigits: 2 })}`,
     group: groupForDate(t.created_at),
+    raw: t,
   }))
 }
 
@@ -78,6 +80,16 @@ export default function Activity({ onBack }: Props) {
   const [activities, setActivities] = useState<ActivityItem[]>([])
   const [loading, setLoading] = useState(true)
   const [showAdd, setShowAdd] = useState(false)
+  const [editTx, setEditTx] = useState<any | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const removeTx = async (id: string) => {
+    if (!window.confirm('¿Eliminar este movimiento?')) return
+    setDeletingId(id)
+    const res = await fetch(`/api/transactions?id=${encodeURIComponent(id)}`, { method: 'DELETE' })
+    if (res.ok) loadTransactions()
+    setDeletingId(null)
+  }
 
   const loadTransactions = () => {
     fetch('/api/transactions')
@@ -172,10 +184,22 @@ export default function Activity({ onBack }: Props) {
                         <p className="text-sm text-on-surface-variant truncate">{item.detail}</p>
                       </div>
                     </div>
-                    <div className="text-right flex-shrink-0">
-                      {item.amount && <p className={`text-sm font-bold ${item.tone === 'danger' ? 'text-error' : 'text-secondary'}`}>{item.amount}</p>}
-                      {item.status && <span className={`pill-status ${item.tone === 'warning' ? 'bg-secondary-container text-secondary' : 'bg-surface-container-high text-on-surface-variant'}`}>{item.status}</span>}
-                      <p className="text-[11px] text-outline mt-1">{item.meta}</p>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <div className="text-right">
+                        {item.amount && <p className={`text-sm font-bold ${item.tone === 'danger' ? 'text-error' : 'text-secondary'}`}>{item.amount}</p>}
+                        {item.status && <span className={`pill-status ${item.tone === 'warning' ? 'bg-secondary-container text-secondary' : 'bg-surface-container-high text-on-surface-variant'}`}>{item.status}</span>}
+                        <p className="text-[11px] text-outline mt-1">{item.meta}</p>
+                      </div>
+                      {item.raw && (
+                        <div className="flex flex-col gap-1">
+                          <button onClick={() => setEditTx(item.raw)} className="p-1.5 text-primary hover:bg-surface-container-high rounded-lg" title="Editar">
+                            <span className="material-symbols-outlined text-[18px]">edit</span>
+                          </button>
+                          <button onClick={() => removeTx(item.id)} disabled={deletingId === item.id} className="p-1.5 text-error hover:bg-error hover:text-white rounded-lg disabled:opacity-50" title="Eliminar">
+                            <span className="material-symbols-outlined text-[18px]">{deletingId === item.id ? 'hourglass_top' : 'delete'}</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -197,6 +221,13 @@ export default function Activity({ onBack }: Props) {
         <AddTransactionModal
           onClose={() => setShowAdd(false)}
           onSaved={() => { setShowAdd(false); setLoading(true); loadTransactions() }}
+        />
+      )}
+      {editTx && (
+        <AddTransactionModal
+          transaction={editTx}
+          onClose={() => setEditTx(null)}
+          onSaved={() => { setEditTx(null); setLoading(true); loadTransactions() }}
         />
       )}
     </div>

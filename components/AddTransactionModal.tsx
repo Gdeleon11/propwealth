@@ -2,16 +2,17 @@
 
 import { useState, useEffect } from 'react'
 
-type Props = { onClose: () => void; onSaved: (tx: any) => void }
+type Props = { onClose: () => void; onSaved: (tx: any) => void; transaction?: any }
 
-export default function AddTransactionModal({ onClose, onSaved }: Props) {
+export default function AddTransactionModal({ onClose, onSaved, transaction }: Props) {
+  const editing = !!transaction
   const [form, setForm] = useState({
-    entity: '',
-    type: 'income',
-    amount: '',
-    status: 'processed',
-    property_id: '',
-    description: '',
+    entity: transaction?.entity || '',
+    type: transaction?.type || 'income',
+    amount: transaction != null ? String(transaction.amount) : '',
+    status: transaction?.status || 'processed',
+    property_id: transaction?.property_id || '',
+    description: transaction?.description || '',
   })
   const [properties, setProperties] = useState<{ id: string; name: string }[]>([])
   const [saving, setSaving] = useState(false)
@@ -34,9 +35,10 @@ export default function AddTransactionModal({ onClose, onSaved }: Props) {
     setSaving(true)
     setError('')
     const res = await fetch('/api/transactions', {
-      method: 'POST',
+      method: editing ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        ...(editing ? { id: transaction.id } : {}),
         entity: form.entity,
         type: form.type,
         amount: Number(form.amount),
@@ -46,7 +48,7 @@ export default function AddTransactionModal({ onClose, onSaved }: Props) {
       }),
     })
     const data = await res.json()
-    if (res.ok) onSaved(data)
+    if (res.ok && !data.error) onSaved(data)
     else {
       setError(data.error || 'Error al guardar')
       setSaving(false)
@@ -57,7 +59,7 @@ export default function AddTransactionModal({ onClose, onSaved }: Props) {
     <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-y-auto max-h-[90vh]">
         <div className="flex items-center justify-between p-6 border-b border-outline-variant">
-          <h2 className="text-2xl font-bold text-primary">Registrar Movimiento</h2>
+          <h2 className="text-2xl font-bold text-primary">{editing ? 'Editar Movimiento' : 'Registrar Movimiento'}</h2>
           <button onClick={onClose} className="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center">
             <span className="material-symbols-outlined">close</span>
           </button>
@@ -119,7 +121,7 @@ export default function AddTransactionModal({ onClose, onSaved }: Props) {
           <button onClick={onClose} className="flex-1 py-3 border border-outline text-primary rounded-lg font-bold text-[11px] tracking-wider hover:bg-surface-container-low">CANCELAR</button>
           <button onClick={save} disabled={saving} className="flex-[2] py-3 bg-primary text-white rounded-lg font-bold text-[11px] tracking-wider hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-sm">{saving ? 'refresh' : 'save'}</span>
-            {saving ? 'GUARDANDO...' : 'GUARDAR MOVIMIENTO'}
+            {saving ? 'GUARDANDO...' : (editing ? 'GUARDAR CAMBIOS' : 'GUARDAR MOVIMIENTO')}
           </button>
         </div>
       </div>

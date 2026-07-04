@@ -35,9 +35,9 @@ export async function GET() {
     if (!userId) return NextResponse.json(FALLBACK)
 
     const [properties, tenants, transactions] = (await Promise.all([
-      db`SELECT name, status, monthly_rent, purchase_value, roi_pct, cash_flow, occupancy_pct FROM properties WHERE user_id = ${userId}`,
+      db`SELECT name, status, monthly_rent, purchase_value, roi_pct, cash_flow, occupancy_pct, maintenance FROM properties WHERE user_id = ${userId}`,
       db`SELECT full_name, payment_status, contract_end, property_id FROM tenants WHERE user_id = ${userId}`,
-      db`SELECT amount, type, entity, created_at FROM transactions WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 100`,
+      db`SELECT amount, type, entity, created_at FROM transactions WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 200`,
     ])) as [any[], any[], any[]]
 
     // Sin datos suficientes: no gastamos una llamada al modelo
@@ -45,30 +45,54 @@ export async function GET() {
       return NextResponse.json(FALLBACK)
     }
 
+    // Métricas calculadas para que el análisis sea concreto y cuantitativo
+    const num = (x: any) => Number(x || 0)
+    const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + num(t.amount), 0)
+    const totalExpenses = transactions.filter(t => t.type === 'expense').reduce((s, t) => s + num(t.amount), 0)
+    const net = totalIncome - totalExpenses
+    const rented = properties.filter(p => p.status === 'rented').length
+    const available = properties.filter(p => p.status === 'available')
+    const portfolioValue = properties.reduce((s, p) => s + num(p.purchase_value), 0)
+    const monthlyRentPotential = properties.reduce((s, p) => s + num(p.monthly_rent), 0)
+    const overdueTenants = tenants.filter(t => t.payment_status === 'overdue').map(t => t.full_name)
+    const pendingTenants = tenants.filter(t => t.payment_status === 'pending').map(t => t.full_name)
+    const soon = new Date(); soon.setDate(soon.getDate() + 60)
+    const expiringContracts = tenants
+      .filter(t => t.contract_end && new Date(t.contract_end) <= soon)
+      .map(t => ({ inquilino: t.full_name, vence: t.contract_end }))
+    const rankedRoi = [...properties].sort((a, b) => num(b.roi_pct) - num(a.roi_pct))
+    const upcomingMaintenance = properties.flatMap((p: any) =>
+      (Array.isArray(p.maintenance) ? p.maintenance : []).map((m: any) => ({ propiedad: p.name, tarea: m.title, fecha: m.date, costo: num(m.cost) }))
+    )
+
     const portfolio = {
-      propiedades: properties.map((p: any) => ({
-        nombre: p.name,
-        estado: p.status,
-        renta_mensual: Number(p.monthly_rent),
-        valor: Number(p.purchase_value),
-        roi_pct: Number(p.roi_pct),
-        flujo_caja: Number(p.cash_flow),
-        ocupacion_pct: Number(p.occupancy_pct),
-      })),
-      inquilinos: tenants.map((t: any) => ({
-        nombre: t.full_name,
-        estado_pago: t.payment_status,
-        fin_contrato: t.contract_end,
-      })),
-      transacciones_recientes: transactions.slice(0, 25).map((t: any) => ({
-        entidad: t.entity,
-        tipo: t.type,
-        monto: Number(t.amount),
-        fecha: t.created_at,
-      })),
+      resumen: {
+        propiedades_total: properties.length,
+        rentadas: rented,
+        disponibles_vacias: available.map(p => p.name),
+        ocupacion_pct: properties.length ? Math.round((rented / properties.length) * 100) : 0,
+        valor_portafolio: portfolioValue,
+        renta_mensual_potencial: monthlyRentPotential,
+        ingresos_totales_registrados: totalIncome,
+        gastos_totales_registrados: totalExpenses,
+        flujo_neto: net,
+        inquilinos_en_mora: overdueTenants,
+        inquilinos_pago_pendiente: pendingTenants,
+        contratos_por_vencer_60d: expiringContracts,
+        mantenimientos_programados: upcomingMaintenance,
+      },
+      propiedades_por_roi: rankedRoi.map((p: any) => ({ nombre: p.name, roi_pct: num(p.roi_pct), estado: p.status, renta: num(p.monthly_rent), flujo: num(p.cash_flow) })),
     }
 
-    const prompt = `Eres un analista financiero inmobiliario. Analiza este portafolio y responde SOLO con un objeto JSON válido con exactamente dos campos: "title" (un titular corto y accionable, máx 8 palabras) e "insight" (una recomendación concreta basada en los datos, máx 45 palabras, en español). No inventes datos que no estén presentes. Portafolio: ${JSON.stringify(portfolio)}`
+    const prompt = `Eres un asesor financiero inmobiliario senior. Analiza los datos REALES de este portafolio y da un diagnóstico específico y cuantitativo (usa nombres de propiedades/inquilinos y cifras concretas que aparezcan en los datos; nunca inventes).
+
+Detecta el punto más importante a atender ahora mismo: por ejemplo inquilinos en mora, propiedades vacías que no generan renta, contratos por vencer, o gastos que superan ingresos.
+
+Responde SOLO con un objeto JSON con dos campos:
+- "title": titular accionable y específico, máx 9 palabras (ej. "Cobra la renta vencida de Fernando").
+- "insight": 2 recomendaciones concretas con cifras/nombres reales, máx 60 palabras, en español, tono profesional y directo. Si faltan datos para un buen análisis, dilo y sugiere qué registrar.
+
+Datos: ${JSON.stringify(portfolio)}`
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -78,8 +102,8 @@ export async function GET() {
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        temperature: 0.4,
-        max_tokens: 300,
+        temperature: 0.5,
+        max_tokens: 450,
         response_format: { type: 'json_object' },
         messages: [
           { role: 'system', content: 'Responde únicamente con JSON válido. Sé preciso y no inventes cifras.' },

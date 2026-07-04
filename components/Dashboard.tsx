@@ -192,7 +192,7 @@ export default function Dashboard({ onViewActivity }: Props) {
       </section>
 
       {/* AI Banner */}
-      <section className="relative overflow-hidden rounded-xl h-44 border border-outline-variant bg-primary-container mb-4">
+      <section className="relative overflow-hidden rounded-xl min-h-[176px] border border-outline-variant bg-primary-container mb-4">
         <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px,transparent 0)', backgroundSize: '24px 24px' }}/>
         <div className="relative z-10 p-6 flex flex-col h-full justify-center text-white">
           <span className="bg-secondary px-3 py-1 rounded-full text-[10px] font-bold w-fit mb-3">POTENCIADO POR IA</span>

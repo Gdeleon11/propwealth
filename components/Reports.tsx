@@ -47,13 +47,11 @@ export default function Reports() {
   const totalExpenses = data?.totalExpenses || 0
   const delinquencyRate = data?.delinquencyRate || 0
 
-  // Puntos para la línea de flujo de caja (ingresos) escalados a un viewBox 0..100
-  const cashPoints = monthly.map((m, i) => {
-    const x = monthly.length > 1 ? (i / (monthly.length - 1)) * 1000 : 0
-    const y = 100 - (m.income / maxCash) * 80
-    return `${x.toFixed(0)},${y.toFixed(1)}`
-  })
-  const cashLine = cashPoints.join(' ')
+  // Puntos para las líneas de flujo de caja (ingresos y gastos) en un viewBox 0..100
+  const xAt = (i: number) => (monthly.length > 1 ? (i / (monthly.length - 1)) * 1000 : 0)
+  const yAt = (v: number) => 100 - (v / maxCash) * 80
+  const cashLine = monthly.map((m, i) => `${xAt(i).toFixed(0)},${yAt(m.income).toFixed(1)}`).join(' ')
+  const expenseLine = monthly.map((m, i) => `${xAt(i).toFixed(0)},${yAt(m.expense).toFixed(1)}`).join(' ')
 
   return (
     <div className="px-6 py-4 space-y-4">
@@ -158,6 +156,7 @@ export default function Reports() {
                   </defs>
                   <polygon points={`0,100 ${cashLine} 1000,100`} fill="url(#incGrad)" opacity="0.1"/>
                   <polyline points={cashLine} fill="none" stroke="#006e25" strokeWidth="2" vectorEffect="non-scaling-stroke"/>
+                  <polyline points={expenseLine} fill="none" stroke="#ba1a1a" strokeWidth="2" strokeDasharray="4 3" vectorEffect="non-scaling-stroke"/>
                 </svg>
               </div>
               <div className="flex justify-between mt-2 border-t border-outline-variant pt-2">
