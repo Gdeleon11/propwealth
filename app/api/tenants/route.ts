@@ -114,3 +114,43 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const db = sql()
+  if (!db) return NextResponse.json({ error: 'Database not available' }, { status: 500 })
+
+  const body = await req.json()
+  if (!body.id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+
+  try {
+    const users = (await db`SELECT id FROM users WHERE email = ${session.user.email}`) as any[]
+    const userId = users[0]?.id
+    if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+
+    // Solo actualizamos los campos enviados; el resto se conserva.
+    const current = (await db`SELECT * FROM tenants WHERE id = ${body.id} AND user_id = ${userId}`) as any[]
+    const t = current[0]
+    if (!t) return NextResponse.json({ error: 'Tenant not found' }, { status: 404 })
+
+    const rows = (await db`
+      UPDATE tenants
+      SET property_id = ${body.property_id !== undefined ? (body.property_id || null) : t.property_id},
+          full_name = ${body.full_name ?? t.full_name},
+          email = ${body.email ?? t.email},
+          phone = ${body.phone ?? t.phone},
+          contract_start = ${body.contract_start ?? t.contract_start},
+          contract_end = ${body.contract_end ?? t.contract_end},
+          payment_status = ${body.payment_status ?? t.payment_status}
+      WHERE id = ${body.id} AND user_id = ${userId}
+      RETURNING *
+    `) as any[]
+    return NextResponse.json(rows[0])
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 })
+  }
+}

@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import type { Property } from '@/lib/db'
+import { useEffect, useState } from 'react'
+import type { Property, Tenant } from '@/lib/db'
+import { fileToResizedDataUrl, fileToDataUrl } from '@/lib/media'
+import MapPicker from './MapPicker'
 
 type Props = {
   property: Property
@@ -10,18 +12,28 @@ type Props = {
   onSaved: (property: Property) => void
 }
 
-const tabs = ['Resumen', 'Finanzas', 'Mantenimiento', 'Documentos']
-
 function money(value: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value)
 }
 
+function fmtDate(d?: string) {
+  if (!d) return '—'
+  const date = new Date(d)
+  if (isNaN(date.getTime())) return d
+  return date.toLocaleDateString('es', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
 export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: Props) {
-  const [activeTab, setActiveTab] = useState('Resumen')
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [error, setError] = useState('')
+
   const [form, setForm] = useState({
-    ...property,
+    name: property.name,
+    address: property.address,
+    type: property.type,
+    status: property.status,
     monthly_rent: String(property.monthly_rent),
     purchase_value: String(property.purchase_value),
     security_deposit: String(property.security_deposit),
@@ -29,19 +41,99 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
     cash_flow: String(property.cash_flow),
     occupancy_pct: String(property.occupancy_pct),
   })
+  const [photos, setPhotos] = useState<string[]>(
+    property.image_url ? [property.image_url, ...(property.gallery || [])] : [...(property.gallery || [])]
+  )
+  const [services, setServices] = useState<{ name: string; active: boolean }[]>(property.services || [])
+  const [maintenance, setMaintenance] = useState<{ title: string; date: string }[]>(property.maintenance || [])
+  const [documents, setDocuments] = useState<{ name: string; data: string }[]>(property.documents || [])
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
+    property.lat != null && property.lng != null ? { lat: Number(property.lat), lng: Number(property.lng) } : null
+  )
+  const [serviceInput, setServiceInput] = useState('')
+  const [maintTitle, setMaintTitle] = useState('')
+  const [maintDate, setMaintDate] = useState('')
 
-  const set = (key: string, value: string) => setForm((current) => ({ ...current, [key]: value }))
+  // Inquilinos
+  const [tenants, setTenants] = useState<Tenant[]>([])
+  const [assignId, setAssignId] = useState('')
+
+  const loadTenants = () => {
+    fetch('/api/tenants')
+      .then(r => r.json())
+      .then(d => setTenants(Array.isArray(d) ? d : []))
+      .catch(() => setTenants([]))
+  }
+  useEffect(() => { loadTenants() }, [])
+
+  const assignedTenants = tenants.filter(t => (t as any).property_id === property.id)
+
+  const set = (key: string, value: string) => setForm(current => ({ ...current, [key]: value }))
+
+  const onPhotos = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    setUploading(true); setError('')
+    try {
+      const urls: string[] = []
+      for (const file of Array.from(files).slice(0, 8)) urls.push(await fileToResizedDataUrl(file))
+      setPhotos(p => [...p, ...urls].slice(0, 8))
+    } catch (e: any) { setError(e.message || 'Error al procesar imágenes') }
+    finally { setUploading(false) }
+  }
+
+  const onDocs = async (files: FileList | null) => {
+    if (!files || files.length === 0) return
+    setUploading(true); setError('')
+    try {
+      for (const file of Array.from(files)) {
+        const data = await fileToDataUrl(file)
+        setDocuments(d => [...d, { name: file.name, data }])
+      }
+    } catch (e: any) { setError(e.message || 'Error al subir documento') }
+    finally { setUploading(false) }
+  }
+
+  const assignTenant = async () => {
+    if (!assignId) return
+    await fetch('/api/tenants', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: assignId, property_id: property.id }),
+    })
+    setAssignId('')
+    loadTenants()
+  }
+
+  const unassignTenant = async (id: string) => {
+    await fetch('/api/tenants', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, property_id: '' }),
+    })
+    loadTenants()
+  }
 
   const save = async () => {
-    setSaving(true)
+    setSaving(true); setError('')
     const payload = {
-      ...form,
+      id: property.id,
+      name: form.name,
+      address: form.address,
+      type: form.type,
+      status: form.status,
       monthly_rent: Number(form.monthly_rent) || 0,
       purchase_value: Number(form.purchase_value) || 0,
       security_deposit: Number(form.security_deposit) || 0,
       roi_pct: Number(form.roi_pct) || 0,
       cash_flow: Number(form.cash_flow) || 0,
       occupancy_pct: Number(form.occupancy_pct) || 0,
+      image_url: photos[0] || null,
+      gallery: photos.slice(1),
+      services,
+      maintenance,
+      documents,
+      lat: coords?.lat ?? null,
+      lng: coords?.lng ?? null,
     }
     const res = await fetch('/api/properties', {
       method: 'PATCH',
@@ -49,26 +141,22 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
       body: JSON.stringify(payload),
     })
     const data = await res.json()
-    if (res.ok) {
-      onSaved(data)
-      setEditing(false)
-    }
+    if (res.ok && !data.error) { onSaved(data); setEditing(false) }
+    else setError(data.error || 'Error al guardar')
     setSaving(false)
   }
 
   const displayed = {
-    ...property,
     name: form.name,
-    address: form.address,
     type: form.type,
     status: form.status,
+    address: form.address,
     monthly_rent: Number(form.monthly_rent) || 0,
-    purchase_value: Number(form.purchase_value) || 0,
-    security_deposit: Number(form.security_deposit) || 0,
     roi_pct: Number(form.roi_pct) || 0,
     cash_flow: Number(form.cash_flow) || 0,
-    occupancy_pct: Number(form.occupancy_pct) || 0,
   }
+  const cover = photos[0] || imageUrl
+  const statusLabel = displayed.status === 'rented' ? 'RENTADA' : displayed.status === 'maintenance' ? 'MANTENIMIENTO' : 'DISPONIBLE'
 
   return (
     <div className="px-6 py-4 space-y-4">
@@ -79,147 +167,240 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
           </button>
           <div>
             <h2 className="text-[28px] font-bold text-primary leading-tight">{displayed.name}</h2>
-            <p className="text-sm text-on-surface-variant">{displayed.type} · {displayed.status}</p>
+            <p className="text-sm text-on-surface-variant">{displayed.type} · {statusLabel.toLowerCase()}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 rounded-lg text-[11px] font-bold tracking-wider border ${activeTab === tab ? 'bg-primary text-white border-primary' : 'bg-white border-outline-variant text-on-surface-variant'}`}
-            >
-              {tab}
+          {editing && (
+            <button onClick={save} disabled={saving || uploading} className="px-5 py-2 rounded-lg bg-primary text-white text-[11px] font-bold tracking-wider disabled:opacity-50">
+              {saving ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}
             </button>
-          ))}
-          <button onClick={() => setEditing((value) => !value)} className="px-4 py-2 rounded-lg bg-secondary text-white text-[11px] font-bold tracking-wider flex items-center gap-2">
+          )}
+          <button onClick={() => setEditing(v => !v)} className="px-4 py-2 rounded-lg bg-secondary text-white text-[11px] font-bold tracking-wider flex items-center gap-2">
             <span className="material-symbols-outlined text-[16px]">{editing ? 'close' : 'edit'}</span>
             {editing ? 'CANCELAR' : 'EDITAR'}
           </button>
         </div>
       </div>
 
+      {error && <p className="bg-error-container text-on-error-container text-sm p-3 rounded-lg">{error}</p>}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <section className="lg:col-span-2 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 h-auto md:h-[320px]">
-            <div className="md:col-span-2 relative overflow-hidden rounded-xl border border-outline-variant min-h-[260px]">
-              <img src={imageUrl} alt={displayed.name} className="w-full h-full object-cover" />
-              <span className="absolute top-4 left-4 bg-secondary text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-wider">RENTADA</span>
+          {/* Galería */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2 md:h-[320px]">
+            <div className="md:col-span-2 relative overflow-hidden rounded-xl border border-outline-variant min-h-[260px] bg-surface-container-high">
+              {cover ? <img src={cover} alt={displayed.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-on-surface-variant"><span className="material-symbols-outlined text-[48px]">image</span></div>}
+              <span className="absolute top-4 left-4 bg-secondary text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-wider">{statusLabel}</span>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-1 gap-2">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbQra04Nwc4df0SeIWQUKKsC3TCyqvtdPV38h8EF4FyM2oX4EADN4FNx0ZrxGA4b7m5peMJwxkLm6HJFhNcmE-qjDc1Ayg5zZc4EAwphNN2cTt0471aQtDopef3WWwHOxHJ3C0TvaP4Je-Ip3v1O_tt3-JDIWx_On9inzzRWniDWAqNeExyyeACL-2qk7_60FuIh6oAvwIYTQ_3A1DxAYFmQzB175_bF8f2RquxBvmd3J3ZSpGiu6Ekg" alt="Interior" className="rounded-xl border border-outline-variant h-32 md:h-full w-full object-cover" />
-              <div className="relative rounded-xl overflow-hidden border border-outline-variant">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuANGh1A3N52AFgxtakTAMuipLEnt_Dc8sFfGG1xdnnQuzDkKhGW-hL3PC20u9xm7-NK-RS2dJaw3V-Z6PRSzANXH6_0IKw_xzD9Lc32LWg-MSflD3Jmh8AVkBa99aJDdZLNawoaGNwe_DbyYchwZj5GLYN5LotSeZl4Xxa8LBBADnAOSkFETwbckFkVh6VDrhYAGUT9pdurAAXz4lB9Ko0TT24xkN0QDboKD8cquZEyBjydUpfOniHx1A" alt="Habitacion" className="h-32 md:h-full w-full object-cover" />
-                <span className="absolute bottom-3 right-3 bg-black/65 text-white px-3 py-1 rounded-full text-[10px] font-bold">+12 Fotos</span>
-              </div>
+              {photos.slice(1, 3).map((src, i) => (
+                <div key={i} className="relative rounded-xl overflow-hidden border border-outline-variant h-32 md:h-full">
+                  <img src={src} alt={`Foto ${i + 2}`} className="w-full h-full object-cover" />
+                  {i === 1 && photos.length > 3 && <span className="absolute bottom-3 right-3 bg-black/65 text-white px-3 py-1 rounded-full text-[10px] font-bold">+{photos.length - 3} Fotos</span>}
+                </div>
+              ))}
+              {photos.length < 2 && !editing && (
+                <div className="rounded-xl border border-dashed border-outline-variant h-32 md:h-full flex items-center justify-center text-on-surface-variant text-xs">Sin más fotos</div>
+              )}
             </div>
           </div>
 
           {editing && (
-            <div className="bg-white border border-outline-variant rounded-xl p-5 card-shadow grid grid-cols-1 md:grid-cols-3 gap-4">
-              <label className="md:col-span-2 text-[11px] font-bold tracking-wider text-outline uppercase">Nombre
-                <input value={form.name} onChange={(e) => set('name', e.target.value)} className="mt-1 w-full border border-outline-variant rounded-lg px-3 py-2 text-base text-primary outline-none focus:border-primary" />
-              </label>
-              <label className="text-[11px] font-bold tracking-wider text-outline uppercase">Estado
-                <select value={form.status} onChange={(e) => set('status', e.target.value)} className="mt-1 w-full border border-outline-variant rounded-lg px-3 py-2 text-base text-primary outline-none focus:border-primary bg-white">
-                  <option value="rented">Rentada</option>
-                  <option value="available">Disponible</option>
-                  <option value="maintenance">Mantenimiento</option>
-                </select>
-              </label>
-              <label className="md:col-span-3 text-[11px] font-bold tracking-wider text-outline uppercase">Direccion
-                <input value={form.address} onChange={(e) => set('address', e.target.value)} className="mt-1 w-full border border-outline-variant rounded-lg px-3 py-2 text-base text-primary outline-none focus:border-primary" />
-              </label>
-              {[
-                ['monthly_rent', 'Renta mensual'],
-                ['purchase_value', 'Precio / valor'],
-                ['security_deposit', 'Deposito'],
-                ['roi_pct', 'ROI %'],
-                ['cash_flow', 'Flujo de caja'],
-                ['occupancy_pct', 'Ocupacion %'],
-              ].map(([key, label]) => (
-                <label key={key} className="text-[11px] font-bold tracking-wider text-outline uppercase">{label}
-                  <input type="number" value={(form as any)[key]} onChange={(e) => set(key, e.target.value)} className="mt-1 w-full border border-outline-variant rounded-lg px-3 py-2 text-base text-primary outline-none focus:border-primary" />
+            <div className="bg-white border border-outline-variant rounded-xl p-5 card-shadow space-y-4">
+              {/* Fotos editables */}
+              <div>
+                <p className="text-[11px] font-bold tracking-wider text-outline uppercase mb-2">Fotos</p>
+                <div className="grid grid-cols-5 gap-2">
+                  {photos.map((src, i) => (
+                    <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-outline-variant">
+                      <img src={src} alt={`Foto ${i + 1}`} className="w-full h-full object-cover" />
+                      {i === 0 && <span className="absolute top-1 left-1 bg-secondary text-white text-[8px] font-bold px-1 rounded">PORTADA</span>}
+                      <button onClick={() => setPhotos(p => p.filter((_, idx) => idx !== i))} className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <span className="material-symbols-outlined text-[13px]">close</span>
+                      </button>
+                    </div>
+                  ))}
+                  {photos.length < 8 && (
+                    <label className="aspect-square rounded-lg border border-dashed border-outline-variant flex flex-col items-center justify-center cursor-pointer hover:border-primary text-on-surface-variant hover:text-primary">
+                      <span className="material-symbols-outlined">{uploading ? 'hourglass_top' : 'add_a_photo'}</span>
+                      <input type="file" accept="image/*" multiple className="hidden" onChange={e => onPhotos(e.target.files)} />
+                    </label>
+                  )}
+                </div>
+              </div>
+
+              {/* Campos básicos */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <label className="md:col-span-2 text-[11px] font-bold tracking-wider text-outline uppercase">Nombre
+                  <input value={form.name} onChange={e => set('name', e.target.value)} className="mt-1 w-full border border-outline-variant rounded-lg px-3 py-2 text-base text-primary outline-none focus:border-primary" />
                 </label>
-              ))}
-              <div className="md:col-span-3 flex justify-end">
-                <button onClick={save} disabled={saving} className="px-5 py-3 bg-primary text-white rounded-lg text-[11px] font-bold tracking-wider disabled:opacity-60">
-                  {saving ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}
-                </button>
+                <label className="text-[11px] font-bold tracking-wider text-outline uppercase">Estado
+                  <select value={form.status} onChange={e => set('status', e.target.value)} className="mt-1 w-full border border-outline-variant rounded-lg px-3 py-2 text-base text-primary outline-none focus:border-primary bg-white">
+                    <option value="rented">Rentada</option>
+                    <option value="available">Disponible</option>
+                    <option value="maintenance">Mantenimiento</option>
+                  </select>
+                </label>
+                <label className="md:col-span-3 text-[11px] font-bold tracking-wider text-outline uppercase">Dirección
+                  <input value={form.address} onChange={e => set('address', e.target.value)} className="mt-1 w-full border border-outline-variant rounded-lg px-3 py-2 text-base text-primary outline-none focus:border-primary" />
+                </label>
+                {[
+                  ['monthly_rent', 'Renta mensual'],
+                  ['purchase_value', 'Precio / valor'],
+                  ['security_deposit', 'Depósito'],
+                  ['roi_pct', 'ROI %'],
+                  ['cash_flow', 'Flujo de caja'],
+                  ['occupancy_pct', 'Ocupación %'],
+                ].map(([key, label]) => (
+                  <label key={key} className="text-[11px] font-bold tracking-wider text-outline uppercase">{label}
+                    <input type="number" value={(form as any)[key]} onChange={e => set(key, e.target.value)} className="mt-1 w-full border border-outline-variant rounded-lg px-3 py-2 text-base text-primary outline-none focus:border-primary" />
+                  </label>
+                ))}
               </div>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Metric label="RENTA MENSUAL" value={money(displayed.monthly_rent)} />
-            <Metric label="ROI ANUAL" value={`${displayed.roi_pct}%`} sub="+ 0.4% vs mes anterior" tone="green" />
-            <Metric label="FLUJO DE CAJA" value={money(displayed.cash_flow)} sub="NETO DESPUES DE GASTOS" />
+            <Metric label="ROI ANUAL" value={`${displayed.roi_pct}%`} tone="green" />
+            <Metric label="FLUJO DE CAJA" value={money(displayed.cash_flow)} sub="NETO DESPUÉS DE GASTOS" />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Ubicación */}
             <div className="bg-white border border-outline-variant rounded-xl p-5 card-shadow">
               <h3 className="text-[11px] font-bold tracking-widest text-on-surface-variant uppercase flex items-center gap-2 mb-4">
-                <span className="material-symbols-outlined text-[17px]">location_on</span> Ubicacion
+                <span className="material-symbols-outlined text-[17px]">location_on</span> Ubicación
               </h3>
               <p className="text-sm text-primary mb-4">{displayed.address}</p>
-              <div className="h-44 rounded-lg bg-[linear-gradient(135deg,#dfe7ee,#f5f7f9)] border border-outline-variant relative overflow-hidden">
-                <div className="absolute inset-0 opacity-60" style={{ backgroundImage: 'linear-gradient(#cbd5df 1px, transparent 1px), linear-gradient(90deg, #cbd5df 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-full text-primary">
-                  <span className="material-symbols-outlined text-[34px]">location_on</span>
-                </div>
-              </div>
+              {editing ? (
+                <MapPicker editable lat={coords?.lat} lng={coords?.lng} onChange={(lat, lng) => setCoords({ lat, lng })} height={200} />
+              ) : coords ? (
+                <MapPicker lat={coords.lat} lng={coords.lng} height={176} />
+              ) : (
+                <div className="h-44 rounded-lg bg-surface-container-high border border-outline-variant flex items-center justify-center text-on-surface-variant text-sm">Sin ubicación definida</div>
+              )}
             </div>
 
+            {/* Servicios */}
             <div className="bg-white border border-outline-variant rounded-xl p-5 card-shadow">
               <h3 className="text-[11px] font-bold tracking-widest text-on-surface-variant uppercase flex items-center gap-2 mb-4">
                 <span className="material-symbols-outlined text-[17px]">bolt</span> Servicios incluidos
               </h3>
-              {['Agua Potable', 'Luz Electrica', 'Internet Fibra'].map((service) => (
-                <div key={service} className="flex items-center justify-between py-3 border-b border-surface-variant last:border-0">
-                  <span className="flex items-center gap-2 text-sm text-primary"><span className="material-symbols-outlined text-[17px]">radio_button_checked</span>{service}</span>
-                  <span className="pill-status bg-secondary-container text-secondary">ACTIVO</span>
+              {services.length === 0 && !editing && <p className="text-sm text-on-surface-variant">Sin servicios registrados</p>}
+              {services.map((s, i) => (
+                <div key={i} className="flex items-center justify-between py-2.5 border-b border-surface-variant last:border-0">
+                  <span className="flex items-center gap-2 text-sm text-primary"><span className="material-symbols-outlined text-[17px]">radio_button_checked</span>{s.name}</span>
+                  {editing ? (
+                    <button onClick={() => setServices(list => list.filter((_, idx) => idx !== i))} className="text-error"><span className="material-symbols-outlined text-[17px]">delete</span></button>
+                  ) : (
+                    <span className="pill-status bg-secondary-container text-secondary">ACTIVO</span>
+                  )}
                 </div>
               ))}
+              {editing && (
+                <div className="flex gap-2 mt-3">
+                  <input value={serviceInput} onChange={e => setServiceInput(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); if (serviceInput.trim()) { setServices(s => [...s, { name: serviceInput.trim(), active: true }]); setServiceInput('') } } }}
+                    placeholder="Agregar servicio..." className="flex-1 border border-outline-variant rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" />
+                  <button onClick={() => { if (serviceInput.trim()) { setServices(s => [...s, { name: serviceInput.trim(), active: true }]); setServiceInput('') } }} className="px-3 py-2 bg-primary text-white rounded-lg text-[11px] font-bold">+</button>
+                </div>
+              )}
             </div>
           </div>
         </section>
 
         <aside className="space-y-4">
-          <Panel title="INFORMACION DEL INQUILINO">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-full bg-primary-container text-primary flex items-center justify-center font-bold">AS</div>
+          {/* Inquilino */}
+          <Panel title="INFORMACIÓN DEL INQUILINO">
+            {assignedTenants.length === 0 ? (
               <div>
-                <p className="font-bold text-primary">Alexander Sterling</p>
-                <p className="text-xs text-on-surface-variant">Consultor Senior</p>
+                <p className="text-sm text-on-surface-variant mb-3">Sin inquilino asignado.</p>
+                <label className="block text-[11px] font-bold tracking-wider text-outline uppercase mb-1">Asignar existente</label>
+                <div className="flex gap-2">
+                  <select value={assignId} onChange={e => setAssignId(e.target.value)} className="flex-1 border border-outline-variant rounded-lg px-3 py-2 text-sm bg-white outline-none focus:border-primary">
+                    <option value="">Elegir inquilino...</option>
+                    {tenants.map(t => <option key={t.id} value={t.id}>{t.full_name}</option>)}
+                  </select>
+                  <button onClick={assignTenant} disabled={!assignId} className="px-3 py-2 bg-primary text-white rounded-lg text-[11px] font-bold disabled:opacity-50">OK</button>
+                </div>
+                {tenants.length === 0 && <p className="text-[11px] text-on-surface-variant mt-2">No tienes inquilinos aún. Créalos en la sección Inquilinos.</p>}
               </div>
-            </div>
-            <div className="space-y-2 text-sm">
-              <Row label="Contrato desde" value="15 Ene, 2023" />
-              <Row label="Expiracion" value="14 Ene, 2025" />
-            </div>
-            <button className="mt-4 w-full py-3 bg-primary text-white rounded text-[11px] font-bold tracking-wider flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined text-[16px]">mail</span> CONTACTAR
-            </button>
+            ) : (
+              assignedTenants.map(t => (
+                <div key={t.id} className="mb-4 last:mb-0">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-12 h-12 rounded-full bg-primary-container text-primary flex items-center justify-center font-bold">
+                      {t.full_name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-bold text-primary">{t.full_name}</p>
+                      <p className="text-xs text-on-surface-variant">{t.email}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <Row label="Contrato desde" value={fmtDate((t as any).contract_start)} />
+                    <Row label="Expiración" value={fmtDate((t as any).contract_end)} />
+                    <Row label="Pago" value={((t as any).payment_status || '').toUpperCase()} />
+                  </div>
+                  <div className="flex gap-2 mt-4">
+                    <a href={`mailto:${t.email}`} className="flex-1 py-2 bg-primary text-white rounded text-[11px] font-bold tracking-wider flex items-center justify-center gap-2">
+                      <span className="material-symbols-outlined text-[16px]">mail</span> CONTACTAR
+                    </a>
+                    <button onClick={() => unassignTenant(t.id)} className="px-3 py-2 border border-outline text-on-surface-variant rounded text-[11px] font-bold tracking-wider" title="Quitar de esta propiedad">
+                      <span className="material-symbols-outlined text-[16px]">link_off</span>
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </Panel>
 
-          <Panel title="PROXIMO MANTENIMIENTO" accent>
-            <div className="bg-surface-container-low p-4 rounded-lg">
-              <p className="font-bold text-primary">Revision de A/C</p>
-              <p className="text-sm text-on-surface-variant mt-1">Programada para: 22 Oct, 2023</p>
+          {/* Mantenimientos */}
+          <Panel title="PRÓXIMOS MANTENIMIENTOS" accent>
+            {maintenance.length === 0 && !editing && <p className="text-sm text-on-surface-variant">Sin mantenimientos programados</p>}
+            <div className="space-y-2">
+              {maintenance.map((m, i) => (
+                <div key={i} className="bg-surface-container-low p-3 rounded-lg flex items-start justify-between">
+                  <div>
+                    <p className="font-bold text-primary text-sm">{m.title}</p>
+                    <p className="text-xs text-on-surface-variant mt-0.5">Programado: {fmtDate(m.date)}</p>
+                  </div>
+                  {editing && <button onClick={() => setMaintenance(list => list.filter((_, idx) => idx !== i))} className="text-error"><span className="material-symbols-outlined text-[17px]">delete</span></button>}
+                </div>
+              ))}
             </div>
-            <button className="mt-3 text-primary text-[11px] font-bold tracking-wider">REPROGRAMAR &gt;</button>
+            {editing && (
+              <div className="mt-3 space-y-2">
+                <input value={maintTitle} onChange={e => setMaintTitle(e.target.value)} placeholder="Título (ej: Revisión A/C)" className="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" />
+                <div className="flex gap-2">
+                  <input type="date" value={maintDate} onChange={e => setMaintDate(e.target.value)} className="flex-1 border border-outline-variant rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" />
+                  <button onClick={() => { if (maintTitle.trim()) { setMaintenance(m => [...m, { title: maintTitle.trim(), date: maintDate }]); setMaintTitle(''); setMaintDate('') } }} className="px-4 py-2 bg-primary text-white rounded-lg text-[11px] font-bold">AGREGAR</button>
+                </div>
+              </div>
+            )}
           </Panel>
 
+          {/* Documentos */}
           <Panel title="DOCUMENTOS">
-            {['Contrato_Arrendamiento.pdf', 'Seguro_Propiedad_2023.pdf', 'Reglamento_Copropiedad.docx'].map((document) => (
-              <div key={document} className="flex items-center justify-between py-3 border-b border-surface-variant last:border-0">
-                <span className="flex items-center gap-2 text-sm text-primary truncate">
-                  <span className="material-symbols-outlined text-error text-[17px]">description</span>{document}
+            {documents.length === 0 && <p className="text-sm text-on-surface-variant mb-2">Sin documentos</p>}
+            {documents.map((doc, i) => (
+              <div key={i} className="flex items-center justify-between py-2.5 border-b border-surface-variant last:border-0">
+                <span className="flex items-center gap-2 text-sm text-primary truncate max-w-[70%]">
+                  <span className="material-symbols-outlined text-error text-[17px]">description</span>{doc.name}
                 </span>
-                <button className="text-outline hover:text-primary"><span className="material-symbols-outlined text-[17px]">download</span></button>
+                <div className="flex items-center gap-1">
+                  <a href={doc.data} download={doc.name} className="text-outline hover:text-primary"><span className="material-symbols-outlined text-[17px]">download</span></a>
+                  {editing && <button onClick={() => setDocuments(d => d.filter((_, idx) => idx !== i))} className="text-error"><span className="material-symbols-outlined text-[17px]">delete</span></button>}
+                </div>
               </div>
             ))}
-            <button className="mt-3 w-full py-3 border border-dashed border-outline-variant rounded-lg text-[11px] font-bold tracking-wider text-on-surface-variant hover:border-primary hover:text-primary">+ SUBIR NUEVO DOCUMENTO</button>
+            <label className="mt-3 w-full py-3 border border-dashed border-outline-variant rounded-lg text-[11px] font-bold tracking-wider text-on-surface-variant hover:border-primary hover:text-primary flex items-center justify-center gap-2 cursor-pointer">
+              <span className="material-symbols-outlined text-[16px]">upload</span> {uploading ? 'SUBIENDO...' : '+ SUBIR DOCUMENTO'}
+              <input type="file" className="hidden" multiple onChange={e => onDocs(e.target.files)} />
+            </label>
+            <p className="text-[11px] text-on-surface-variant mt-2">Máx 3MB por archivo. Recuerda &quot;Guardar cambios&quot;.</p>
           </Panel>
         </aside>
       </div>

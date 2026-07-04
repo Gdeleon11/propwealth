@@ -37,6 +37,12 @@ export type Property = {
   roi_pct: number
   cash_flow: number
   image_url: string | null
+  lat?: number | null
+  lng?: number | null
+  gallery?: string[]
+  services?: { name: string; active: boolean }[]
+  maintenance?: { title: string; date: string }[]
+  documents?: { name: string; data: string }[]
   created_at: string
 }
 

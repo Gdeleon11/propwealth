@@ -82,14 +82,23 @@ export async function POST(req: NextRequest) {
     const userId = users[0]?.id
     if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
+    const gallery = Array.isArray(body.gallery) ? body.gallery : []
+    const services = Array.isArray(body.services) ? body.services : []
+    const maintenance = Array.isArray(body.maintenance) ? body.maintenance : []
+    const documents = Array.isArray(body.documents) ? body.documents : []
+
     const rows = (await db`
       INSERT INTO properties
-        (user_id, name, address, type, status, monthly_rent, purchase_value, security_deposit, occupancy_pct, roi_pct, cash_flow, image_url)
+        (user_id, name, address, type, status, monthly_rent, purchase_value, security_deposit, occupancy_pct, roi_pct, cash_flow,
+         image_url, lat, lng, gallery, services, maintenance, documents)
       VALUES
         (${userId}, ${body.name}, ${body.address}, ${body.type || 'Apartamento'},
          ${body.status || 'available'},
          ${Number(body.monthly_rent) || 0}, ${Number(body.purchase_value) || 0},
-         ${Number(body.security_deposit) || 0}, 0, 0, 0, ${body.image_url || null})
+         ${Number(body.security_deposit) || 0}, 0, 0, 0,
+         ${body.image_url || null},
+         ${body.lat != null ? Number(body.lat) : null}, ${body.lng != null ? Number(body.lng) : null},
+         ${JSON.stringify(gallery)}, ${JSON.stringify(services)}, ${JSON.stringify(maintenance)}, ${JSON.stringify(documents)})
       RETURNING *
     `) as any[]
     return NextResponse.json(rows[0], { status: 201 })
@@ -143,6 +152,11 @@ export async function PATCH(req: NextRequest) {
     const userId = users[0]?.id
     if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
+    const gallery = Array.isArray(body.gallery) ? body.gallery : []
+    const services = Array.isArray(body.services) ? body.services : []
+    const maintenance = Array.isArray(body.maintenance) ? body.maintenance : []
+    const documents = Array.isArray(body.documents) ? body.documents : []
+
     const rows = (await db`
       UPDATE properties
       SET name = ${body.name},
@@ -155,7 +169,13 @@ export async function PATCH(req: NextRequest) {
           occupancy_pct = ${Number(body.occupancy_pct) || 0},
           roi_pct = ${Number(body.roi_pct) || 0},
           cash_flow = ${Number(body.cash_flow) || 0},
-          image_url = ${body.image_url || null}
+          image_url = ${body.image_url || null},
+          lat = ${body.lat != null ? Number(body.lat) : null},
+          lng = ${body.lng != null ? Number(body.lng) : null},
+          gallery = ${JSON.stringify(gallery)},
+          services = ${JSON.stringify(services)},
+          maintenance = ${JSON.stringify(maintenance)},
+          documents = ${JSON.stringify(documents)}
       WHERE id = ${body.id} AND user_id = ${userId}
       RETURNING *
     `) as any[]
