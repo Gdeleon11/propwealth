@@ -15,6 +15,7 @@ export default function Providers() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
+  const [editProvider, setEditProvider] = useState<Provider | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -91,11 +92,17 @@ export default function Providers() {
                 <span className="text-sm">{p.properties_count} Propiedades</span>
               </div>
               <div className="flex gap-2 mt-auto">
-                <button className="flex-1 h-10 border border-outline-variant rounded-lg flex items-center justify-center gap-2 text-primary text-[11px] font-bold tracking-wider hover:bg-surface-container-low">
-                  <span className="material-symbols-outlined text-lg">call</span>Llamar
-                </button>
-                <button className="flex-1 h-10 bg-primary text-white rounded-lg flex items-center justify-center text-[11px] font-bold tracking-wider hover:opacity-90">
-                  Ver Perfil
+                {p.phone ? (
+                  <a href={`tel:${p.phone}`} className="flex-1 h-10 border border-outline-variant rounded-lg flex items-center justify-center gap-2 text-primary text-[11px] font-bold tracking-wider hover:bg-surface-container-low">
+                    <span className="material-symbols-outlined text-lg">call</span>Llamar
+                  </a>
+                ) : (
+                  <button disabled className="flex-1 h-10 border border-outline-variant rounded-lg flex items-center justify-center gap-2 text-outline text-[11px] font-bold tracking-wider opacity-60" title="Sin teléfono">
+                    <span className="material-symbols-outlined text-lg">call</span>Llamar
+                  </button>
+                )}
+                <button onClick={() => setEditProvider(p)} className="flex-1 h-10 bg-primary text-white rounded-lg flex items-center justify-center gap-2 text-[11px] font-bold tracking-wider hover:opacity-90">
+                  <span className="material-symbols-outlined text-lg">edit</span>Editar
                 </button>
                 <button
                   onClick={() => remove(p.id)}
@@ -111,6 +118,13 @@ export default function Providers() {
         </div>
       )}
       {showAdd && <AddProviderModal onClose={() => setShowAdd(false)} onSaved={(provider) => { setShowAdd(false); setProviders(current => [provider, ...current]) }} />}
+      {editProvider && (
+        <AddProviderModal
+          provider={editProvider}
+          onClose={() => setEditProvider(null)}
+          onSaved={(updated) => { setEditProvider(null); setProviders(current => current.map(p => p.id === updated.id ? updated : p)) }}
+        />
+      )}
     </div>
   )
 }

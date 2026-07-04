@@ -45,7 +45,7 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
     property.image_url ? [property.image_url, ...(property.gallery || [])] : [...(property.gallery || [])]
   )
   const [services, setServices] = useState<{ name: string; active: boolean }[]>(property.services || [])
-  const [maintenance, setMaintenance] = useState<{ title: string; date: string }[]>(property.maintenance || [])
+  const [maintenance, setMaintenance] = useState<{ title: string; date: string; cost?: number }[]>(property.maintenance || [])
   const [documents, setDocuments] = useState<{ name: string; data: string }[]>(property.documents || [])
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(
     property.lat != null && property.lng != null ? { lat: Number(property.lat), lng: Number(property.lng) } : null
@@ -53,6 +53,7 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
   const [serviceInput, setServiceInput] = useState('')
   const [maintTitle, setMaintTitle] = useState('')
   const [maintDate, setMaintDate] = useState('')
+  const [maintCost, setMaintCost] = useState('')
 
   // Inquilinos
   const [tenants, setTenants] = useState<Tenant[]>([])
@@ -85,12 +86,32 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
     if (!files || files.length === 0) return
     setUploading(true); setError('')
     try {
+      const added: { name: string; data: string }[] = []
       for (const file of Array.from(files)) {
-        const data = await fileToDataUrl(file)
-        setDocuments(d => [...d, { name: file.name, data }])
+        added.push({ name: file.name, data: await fileToDataUrl(file) })
       }
+      const next = [...documents, ...added]
+      setDocuments(next)
+      await patchProperty({ documents: next })
     } catch (e: any) { setError(e.message || 'Error al subir documento') }
     finally { setUploading(false) }
+  }
+
+  // Crea una transacción (ingreso/gasto)
+  const addTransaction = async (tx: { type: 'income' | 'expense'; entity: string; amount: number; tenant_id?: string }) => {
+    if (!tx.amount || tx.amount <= 0) return
+    await fetch('/api/transactions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: tx.type,
+        entity: tx.entity,
+        amount: tx.amount,
+        status: 'processed',
+        property_id: property.id,
+        tenant_id: tx.tenant_id || null,
+      }),
+    })
   }
 
   const assignTenant = async () => {
@@ -100,6 +121,11 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: assignId, property_id: property.id }),
     })
+    // Si la propiedad está rentada y tiene renta, registramos el ingreso del mes
+    const rent = Number(form.monthly_rent) || 0
+    if (form.status === 'rented' && rent > 0) {
+      await addTransaction({ type: 'income', entity: `Renta · ${form.name}`, amount: rent, tenant_id: assignId })
+    }
     setAssignId('')
     loadTenants()
   }
@@ -113,37 +139,70 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
     loadTenants()
   }
 
-  const save = async () => {
-    setSaving(true); setError('')
-    const payload = {
-      id: property.id,
-      name: form.name,
-      address: form.address,
-      type: form.type,
-      status: form.status,
-      monthly_rent: Number(form.monthly_rent) || 0,
-      purchase_value: Number(form.purchase_value) || 0,
-      security_deposit: Number(form.security_deposit) || 0,
-      roi_pct: Number(form.roi_pct) || 0,
-      cash_flow: Number(form.cash_flow) || 0,
-      occupancy_pct: Number(form.occupancy_pct) || 0,
-      image_url: photos[0] || null,
-      gallery: photos.slice(1),
-      services,
-      maintenance,
-      documents,
-      lat: coords?.lat ?? null,
-      lng: coords?.lng ?? null,
-    }
+  // Construye el payload actual; `over` permite sobreescribir listas recién modificadas
+  const buildPayload = (over: Record<string, any> = {}) => ({
+    id: property.id,
+    name: form.name,
+    address: form.address,
+    type: form.type,
+    status: form.status,
+    monthly_rent: Number(form.monthly_rent) || 0,
+    purchase_value: Number(form.purchase_value) || 0,
+    security_deposit: Number(form.security_deposit) || 0,
+    roi_pct: Number(form.roi_pct) || 0,
+    cash_flow: Number(form.cash_flow) || 0,
+    occupancy_pct: Number(form.occupancy_pct) || 0,
+    image_url: photos[0] || null,
+    gallery: photos.slice(1),
+    services,
+    maintenance,
+    documents,
+    lat: coords?.lat ?? null,
+    lng: coords?.lng ?? null,
+    ...over,
+  })
+
+  const patchProperty = async (over: Record<string, any> = {}) => {
     const res = await fetch('/api/properties', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(buildPayload(over)),
     })
     const data = await res.json()
-    if (res.ok && !data.error) { onSaved(data); setEditing(false) }
-    else setError(data.error || 'Error al guardar')
+    if (res.ok && !data.error) { onSaved(data); return true }
+    setError(data.error || 'Error al guardar')
+    return false
+  }
+
+  const save = async () => {
+    setSaving(true); setError('')
+    const ok = await patchProperty()
+    if (ok) setEditing(false)
     setSaving(false)
+  }
+
+  // Agrega mantenimiento (guarda de inmediato) y crea el gasto si tiene costo
+  const addMaintenance = async () => {
+    if (!maintTitle.trim()) return
+    const cost = Number(maintCost) || 0
+    const item = { title: maintTitle.trim(), date: maintDate, cost }
+    const next = [...maintenance, item]
+    setMaintenance(next)
+    setMaintTitle(''); setMaintDate(''); setMaintCost('')
+    await patchProperty({ maintenance: next })
+    if (cost > 0) await addTransaction({ type: 'expense', entity: `Mantenimiento · ${item.title}`, amount: cost })
+  }
+
+  const removeMaintenance = async (i: number) => {
+    const next = maintenance.filter((_, idx) => idx !== i)
+    setMaintenance(next)
+    await patchProperty({ maintenance: next })
+  }
+
+  const removeDocument = async (i: number) => {
+    const next = documents.filter((_, idx) => idx !== i)
+    setDocuments(next)
+    await patchProperty({ documents: next })
   }
 
   const displayed = {
@@ -359,27 +418,32 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
 
           {/* Mantenimientos */}
           <Panel title="PRÓXIMOS MANTENIMIENTOS" accent>
-            {maintenance.length === 0 && !editing && <p className="text-sm text-on-surface-variant">Sin mantenimientos programados</p>}
+            {maintenance.length === 0 && <p className="text-sm text-on-surface-variant mb-3">Sin mantenimientos programados</p>}
             <div className="space-y-2">
               {maintenance.map((m, i) => (
                 <div key={i} className="bg-surface-container-low p-3 rounded-lg flex items-start justify-between">
                   <div>
                     <p className="font-bold text-primary text-sm">{m.title}</p>
-                    <p className="text-xs text-on-surface-variant mt-0.5">Programado: {fmtDate(m.date)}</p>
+                    <p className="text-xs text-on-surface-variant mt-0.5">
+                      Programado: {fmtDate(m.date)}{m.cost ? ` · ${money(Number(m.cost))}` : ''}
+                    </p>
                   </div>
-                  {editing && <button onClick={() => setMaintenance(list => list.filter((_, idx) => idx !== i))} className="text-error"><span className="material-symbols-outlined text-[17px]">delete</span></button>}
+                  <button onClick={() => removeMaintenance(i)} className="text-error"><span className="material-symbols-outlined text-[17px]">delete</span></button>
                 </div>
               ))}
             </div>
-            {editing && (
-              <div className="mt-3 space-y-2">
-                <input value={maintTitle} onChange={e => setMaintTitle(e.target.value)} placeholder="Título (ej: Revisión A/C)" className="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" />
-                <div className="flex gap-2">
-                  <input type="date" value={maintDate} onChange={e => setMaintDate(e.target.value)} className="flex-1 border border-outline-variant rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" />
-                  <button onClick={() => { if (maintTitle.trim()) { setMaintenance(m => [...m, { title: maintTitle.trim(), date: maintDate }]); setMaintTitle(''); setMaintDate('') } }} className="px-4 py-2 bg-primary text-white rounded-lg text-[11px] font-bold">AGREGAR</button>
+            <div className="mt-3 space-y-2 border-t border-surface-variant pt-3">
+              <input value={maintTitle} onChange={e => setMaintTitle(e.target.value)} placeholder="Título (ej: Revisión A/C)" className="w-full border border-outline-variant rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" />
+              <div className="flex gap-2">
+                <input type="date" value={maintDate} onChange={e => setMaintDate(e.target.value)} className="flex-1 border border-outline-variant rounded-lg px-3 py-2 text-sm outline-none focus:border-primary" title="Fecha" />
+                <div className="relative w-28">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-outline text-sm">$</span>
+                  <input type="number" value={maintCost} onChange={e => setMaintCost(e.target.value)} placeholder="Costo" className="w-full border border-outline-variant rounded-lg pl-5 pr-2 py-2 text-sm outline-none focus:border-primary" title="Costo (crea un gasto)" />
                 </div>
               </div>
-            )}
+              <button onClick={addMaintenance} className="w-full py-2 bg-primary text-white rounded-lg text-[11px] font-bold tracking-wider">AGREGAR MANTENIMIENTO</button>
+              <p className="text-[11px] text-on-surface-variant">Si pones un costo, se registra automáticamente como gasto en el Flujo.</p>
+            </div>
           </Panel>
 
           {/* Documentos */}
@@ -392,7 +456,7 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
                 </span>
                 <div className="flex items-center gap-1">
                   <a href={doc.data} download={doc.name} className="text-outline hover:text-primary"><span className="material-symbols-outlined text-[17px]">download</span></a>
-                  {editing && <button onClick={() => setDocuments(d => d.filter((_, idx) => idx !== i))} className="text-error"><span className="material-symbols-outlined text-[17px]">delete</span></button>}
+                  <button onClick={() => removeDocument(i)} className="text-error"><span className="material-symbols-outlined text-[17px]">delete</span></button>
                 </div>
               </div>
             ))}
@@ -400,7 +464,7 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
               <span className="material-symbols-outlined text-[16px]">upload</span> {uploading ? 'SUBIENDO...' : '+ SUBIR DOCUMENTO'}
               <input type="file" className="hidden" multiple onChange={e => onDocs(e.target.files)} />
             </label>
-            <p className="text-[11px] text-on-surface-variant mt-2">Máx 3MB por archivo. Recuerda &quot;Guardar cambios&quot;.</p>
+            <p className="text-[11px] text-on-surface-variant mt-2">Máx 3MB por archivo. Se guardan automáticamente.</p>
           </Panel>
         </aside>
       </div>

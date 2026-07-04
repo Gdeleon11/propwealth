@@ -41,7 +41,7 @@ export type Property = {
   lng?: number | null
   gallery?: string[]
   services?: { name: string; active: boolean }[]
-  maintenance?: { title: string; date: string }[]
+  maintenance?: { title: string; date: string; cost?: number }[]
   documents?: { name: string; data: string }[]
   created_at: string
 }

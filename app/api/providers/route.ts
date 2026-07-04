@@ -109,3 +109,41 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: e.message }, { status: 500 })
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const db = sql()
+  if (!db) return NextResponse.json({ error: 'Database not available' }, { status: 500 })
+
+  const body = await req.json()
+  if (!body.id) return NextResponse.json({ error: 'id required' }, { status: 400 })
+
+  try {
+    const users = (await db`SELECT id FROM users WHERE email = ${session.user.email}`) as any[]
+    const userId = users[0]?.id
+    if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+
+    const current = (await db`SELECT * FROM providers WHERE id = ${body.id} AND user_id = ${userId}`) as any[]
+    const p = current[0]
+    if (!p) return NextResponse.json({ error: 'Provider not found' }, { status: 404 })
+
+    const rows = (await db`
+      UPDATE providers
+      SET name = ${body.name ?? p.name},
+          category = ${body.category ?? p.category},
+          rating = ${body.rating != null ? Number(body.rating) : p.rating},
+          phone = ${body.phone ?? p.phone},
+          email = ${body.email ?? p.email},
+          avatar_url = ${body.avatar_url !== undefined ? (body.avatar_url || null) : p.avatar_url}
+      WHERE id = ${body.id} AND user_id = ${userId}
+      RETURNING *
+    `) as any[]
+    return NextResponse.json(rows[0])
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 })
+  }
+}

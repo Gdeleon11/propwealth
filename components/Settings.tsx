@@ -183,9 +183,25 @@ export default function Settings() {
 
   const currencyOptions = [
     { value: 'USD', label: 'USD — Dólar Estadounidense' },
+    { value: 'GTQ', label: 'GTQ — Quetzal Guatemalteco' },
     { value: 'MXN', label: 'MXN — Peso Mexicano' },
     { value: 'EUR', label: 'EUR — Euro' },
     { value: 'GBP', label: 'GBP — Libra Esterlina' },
+    { value: 'CAD', label: 'CAD — Dólar Canadiense' },
+    { value: 'COP', label: 'COP — Peso Colombiano' },
+    { value: 'CRC', label: 'CRC — Colón Costarricense' },
+    { value: 'HNL', label: 'HNL — Lempira Hondureño' },
+    { value: 'NIO', label: 'NIO — Córdoba Nicaragüense' },
+    { value: 'PAB', label: 'PAB — Balboa Panameño' },
+    { value: 'DOP', label: 'DOP — Peso Dominicano' },
+    { value: 'ARS', label: 'ARS — Peso Argentino' },
+    { value: 'CLP', label: 'CLP — Peso Chileno' },
+    { value: 'PEN', label: 'PEN — Sol Peruano' },
+    { value: 'BRL', label: 'BRL — Real Brasileño' },
+    { value: 'BOB', label: 'BOB — Boliviano' },
+    { value: 'UYU', label: 'UYU — Peso Uruguayo' },
+    { value: 'PYG', label: 'PYG — Guaraní Paraguayo' },
+    { value: 'VES', label: 'VES — Bolívar Venezolano' },
   ]
 
   const timezoneOptions = [

@@ -98,7 +98,7 @@ export default function Activity({ onBack }: Props) {
           <button onClick={onBack} className="w-9 h-9 rounded-full hover:bg-surface-container-high flex items-center justify-center text-primary" title="Volver">
             <span className="material-symbols-outlined">arrow_back</span>
           </button>
-          <h2 className="text-[32px] font-bold leading-tight text-primary">Actividad Reciente</h2>
+          <h2 className="text-[32px] font-bold leading-tight text-primary">Flujo de Caja</h2>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 text-primary hover:bg-surface-container-high rounded-lg text-[11px] font-bold tracking-wider">
           <span className="material-symbols-outlined text-[18px]">download</span>

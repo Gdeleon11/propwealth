@@ -18,7 +18,7 @@ const navItems: { id: Screen; icon: string; label: string }[] = [
   { id: 'properties', icon: 'domain', label: 'Propiedades' },
   { id: 'tenants', icon: 'group', label: 'Inquilinos' },
   { id: 'providers', icon: 'handyman', label: 'Proveedores' },
-  { id: 'payments', icon: 'payments', label: 'Pagos' },
+  { id: 'payments', icon: 'account_balance_wallet', label: 'Flujo' },
   { id: 'reports', icon: 'analytics', label: 'Reportes' },
   { id: 'settings', icon: 'settings', label: 'Ajustes' },
 ]
