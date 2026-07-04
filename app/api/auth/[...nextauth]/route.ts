@@ -49,7 +49,7 @@ const handler = NextAuth({
       if (session.user && session.user.email) {
         const user = await getUser(session.user.email)
         if (user) {
-          session.user.id = user.id
+          (session.user as any).id = user.id
         }
       }
       return session
