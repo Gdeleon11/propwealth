@@ -1,11 +1,10 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function SignInContent() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -20,22 +19,10 @@ export default function SignInContent() {
   const handleGoogleSignIn = async () => {
     setLoading(true)
     setError(null)
-    try {
-      const result = await signIn('google', {
-        redirect: false,
-        callbackUrl: '/dashboard',
-      })
-
-      if (result?.error) {
-        setError('Error al iniciar sesión con Google')
-        setLoading(false)
-      } else if (result?.ok) {
-        router.push('/dashboard')
-      }
-    } catch (err) {
-      setError('Error inesperado. Intenta de nuevo.')
-      setLoading(false)
-    }
+    // OAuth (Google) requiere una redirección completa del navegador a la
+    // pantalla de consentimiento. Con redirect:false el flujo nunca se
+    // completa, por eso hay que dejar que NextAuth redirija.
+    await signIn('google', { callbackUrl: '/' })
   }
 
   return (

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
 import { getServerSession } from 'next-auth/next'
+import { authOptions } from '@/lib/auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +12,7 @@ function sql() {
 }
 
 export async function GET() {
-  const session = await getServerSession()
+  const session = await getServerSession(authOptions)
   if (!session?.user?.email) {
     return NextResponse.json({
       totalPortfolioValue: 0,

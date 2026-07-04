@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useSession, signOut } from 'next-auth/react'
 import Dashboard from '@/components/Dashboard'
 import Properties from '@/components/Properties'
 import Reports from '@/components/Reports'
@@ -21,6 +22,12 @@ const navItems: { id: Screen; icon: string; label: string }[] = [
 
 export default function Home() {
   const [screen, setScreen] = useState<Screen>('dashboard')
+  const { data: session } = useSession()
+
+  const user = session?.user
+  const avatarUrl = user?.image || ''
+  const displayName = user?.name || user?.email || 'Usuario'
+  const initial = (displayName || 'U').charAt(0).toUpperCase()
 
   useEffect(() => {
     const setFromHash = () => {
@@ -58,19 +65,34 @@ export default function Home() {
       <header className="fixed top-0 w-full z-50 bg-surface border-b border-outline-variant">
         <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-2">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden border border-outline-variant">
-              <img
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVBGi0X1dH9qvZS8AqkFZalRpMDg5Zdm_z34dLrEIZ4mGMs5SOM8EMEJlcmTP0BiJbIUD4rBgH2DbRhy-v1Y1tabOY-LThrvWKu52m0tFXKo2RJIvB3V3jFe2RwygIny88L1qBeQ8_Nr1QokRghP2K3kezEkO_UQIU0y5CXVJQIqvO5Dkzn-6jMTmn23U70widlG51yC-wrkLp_S-aVMNCq8FodcoKfUh78dw8RKJlaeLwexU0-gZyKg"
-                alt="Avatar"
-                className="w-full h-full object-cover"
-              />
+            <div className="w-10 h-10 rounded-full overflow-hidden border border-outline-variant flex items-center justify-center bg-primary-container text-primary font-bold">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName}
+                  referrerPolicy="no-referrer"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span>{initial}</span>
+              )}
             </div>
             <span className="text-2xl font-bold text-primary">PropWealth</span>
           </div>
-          <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high text-primary relative">
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
-          </button>
+          <div className="flex items-center gap-2">
+            {user && (
+              <span className="hidden sm:block text-sm text-on-surface-variant max-w-[160px] truncate">
+                {displayName}
+              </span>
+            )}
+            <button
+              onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+              title="Cerrar sesión"
+              className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-high text-primary"
+            >
+              <span className="material-symbols-outlined">logout</span>
+            </button>
+          </div>
         </div>
       </header>
 
