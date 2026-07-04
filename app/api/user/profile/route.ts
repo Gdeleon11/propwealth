@@ -81,7 +81,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    // Update with provided fields (using template literals with Neon)
+    // Update with provided fields
     const result = (await db`
       UPDATE users
       SET
@@ -113,4 +113,8 @@ export async function PATCH(req: NextRequest) {
     console.error('Error updating user profile:', error)
     return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 })
   }
+}
+
+export async function POST(req: NextRequest) {
+  return PATCH(req)
 }
