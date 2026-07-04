@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { formatMoney as fmt } from '@/lib/format'
 
 type DashboardData = {
   totalPortfolioValue: number
@@ -22,10 +23,6 @@ type DashboardData = {
 }
 
 type AiInsight = { title: string; insight: string }
-
-function fmt(n: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
-}
 
 type Props = {
   onViewActivity?: () => void
@@ -104,25 +101,27 @@ export default function Dashboard({ onViewActivity }: Props) {
                     <span className="material-symbols-outlined">error</span>
                   </div>
                   <div>
-                    <p className="font-semibold text-[17px] text-primary">{data.overduePayments} Pagos Vencidos</p>
-                    <p className="text-on-surface-variant text-sm">Prioridad Alta</p>
+                    <p className="font-semibold text-[17px] text-primary">{data.overduePayments} {data.overduePayments === 1 ? 'Pago Vencido' : 'Pagos Vencidos'}</p>
+                    <p className="text-on-surface-variant text-sm">Inquilinos con pago vencido</p>
                   </div>
                 </div>
-                <button className="text-primary hover:underline text-[11px] font-bold tracking-wider">RESOLVER</button>
+                <button onClick={() => { window.location.hash = 'tenants' }} className="text-primary hover:underline text-[11px] font-bold tracking-wider">RESOLVER</button>
               </div>
             )}
-            <div className="bg-white border-l-4 border-tertiary-container p-4 rounded-lg card-shadow flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center text-on-tertiary-container">
-                  <span className="material-symbols-outlined">build</span>
+            {data.pendingPayments > 0 && (
+              <div className="bg-white border-l-4 border-tertiary-container p-4 rounded-lg card-shadow flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-tertiary-fixed rounded-full flex items-center justify-center text-on-tertiary-container">
+                    <span className="material-symbols-outlined">schedule</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[17px] text-primary">{data.pendingPayments} {data.pendingPayments === 1 ? 'Pago Pendiente' : 'Pagos Pendientes'}</p>
+                    <p className="text-on-surface-variant text-sm">Inquilinos con pago por cobrar</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-semibold text-[17px] text-primary">Mantenimiento Pendiente</p>
-                  <p className="text-on-surface-variant text-sm">Prioridad Media · Revisión A/C</p>
-                </div>
+                <button onClick={() => { window.location.hash = 'tenants' }} className="text-primary hover:underline text-[11px] font-bold tracking-wider">VER</button>
               </div>
-              <button className="text-primary hover:underline text-[11px] font-bold tracking-wider">APROBAR</button>
-            </div>
+            )}
           </div>
         </section>
       )}

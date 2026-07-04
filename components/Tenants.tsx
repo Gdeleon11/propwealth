@@ -19,6 +19,7 @@ export default function Tenants() {
   const [tab, setTab] = useState<'current' | 'past'>('current')
   const [search, setSearch] = useState('')
   const [showAdd, setShowAdd] = useState(false)
+  const [editTenant, setEditTenant] = useState<Tenant | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -134,7 +135,14 @@ export default function Tenants() {
                     {PAYMENT_LABELS[t.payment_status] || t.payment_status.toUpperCase()}
                   </span>
                 </div>
-                <div className="flex justify-end items-center lg:px-4">
+                <div className="flex justify-end items-center gap-1 lg:px-4">
+                  <button
+                    onClick={() => setEditTenant(t)}
+                    className="p-2 text-primary hover:bg-surface-container-high rounded-lg"
+                    title="Editar inquilino"
+                  >
+                    <span className="material-symbols-outlined">edit</span>
+                  </button>
                   <button
                     onClick={() => remove(t.id)}
                     disabled={deletingId === t.id}
@@ -150,6 +158,13 @@ export default function Tenants() {
         </div>
       )}
       {showAdd && <AddTenantModal onClose={() => setShowAdd(false)} onSaved={(tenant) => { setShowAdd(false); setTenants(current => [tenant, ...current]) }} />}
+      {editTenant && (
+        <AddTenantModal
+          tenant={editTenant}
+          onClose={() => setEditTenant(null)}
+          onSaved={(updated) => { setEditTenant(null); setTenants(current => current.map(t => t.id === updated.id ? updated : t)) }}
+        />
+      )}
     </div>
   )
 }

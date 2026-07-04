@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { setCurrencyCode } from '@/lib/format'
 
 interface UserProfile {
   id: string
@@ -122,6 +123,7 @@ export default function Settings() {
       if (!res.ok) throw new Error('Failed to fetch profile')
       const data = await res.json()
       setProfile(data)
+      if (data?.currency) setCurrencyCode(data.currency)
     } catch (err: any) {
       setError(err.message || 'Error al cargar el perfil')
     } finally {
@@ -146,6 +148,7 @@ export default function Settings() {
       if (!res.ok) throw new Error('Failed to update profile')
       const updated = await res.json()
       setProfile(updated)
+      if (field === 'currency') setCurrencyCode(value)
       await updateSession()
     } catch (err: any) {
       throw new Error(err.message || 'Error al guardar')

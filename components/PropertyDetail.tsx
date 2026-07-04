@@ -4,16 +4,13 @@ import { useEffect, useState } from 'react'
 import type { Property, Tenant } from '@/lib/db'
 import { fileToResizedDataUrl, fileToDataUrl } from '@/lib/media'
 import MapPicker from './MapPicker'
+import { formatMoney as money } from '@/lib/format'
 
 type Props = {
   property: Property
   imageUrl: string
   onBack: () => void
   onSaved: (property: Property) => void
-}
-
-function money(value: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value)
 }
 
 function fmtDate(d?: string) {
@@ -317,6 +314,20 @@ export default function PropertyDetail({ property, imageUrl, onBack, onSaved }: 
                   </label>
                 ))}
               </div>
+              <div className="flex justify-end gap-2 pt-2 border-t border-outline-variant">
+                <button onClick={() => setEditing(false)} className="px-4 py-2 border border-outline text-primary rounded-lg text-[11px] font-bold tracking-wider">CANCELAR</button>
+                <button onClick={save} disabled={saving || uploading} className="px-6 py-2 bg-primary text-white rounded-lg text-[11px] font-bold tracking-wider disabled:opacity-50">
+                  {saving ? 'GUARDANDO...' : 'GUARDAR CAMBIOS'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!editing && (
+            <div className="flex justify-end">
+              <button onClick={() => setEditing(true)} className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg text-[11px] font-bold tracking-wider hover:opacity-90">
+                <span className="material-symbols-outlined text-[16px]">edit</span> EDITAR DATOS (RENTA, VALOR, FOTOS...)
+              </button>
             </div>
           )}
 

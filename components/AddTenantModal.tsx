@@ -3,17 +3,23 @@
 import { useState, useEffect } from 'react'
 import type { Tenant } from '@/lib/db'
 
-type Props = { onClose: () => void; onSaved: (tenant: Tenant) => void }
+type Props = { onClose: () => void; onSaved: (tenant: Tenant) => void; tenant?: Tenant }
 
-export default function AddTenantModal({ onClose, onSaved }: Props) {
+function dateOnly(d?: string) {
+  if (!d) return ''
+  return String(d).split('T')[0]
+}
+
+export default function AddTenantModal({ onClose, onSaved, tenant }: Props) {
+  const editing = !!tenant
   const [form, setForm] = useState({
-    full_name: '',
-    email: '',
-    phone: '',
-    property_id: '',
-    contract_start: new Date().toISOString().split('T')[0],
-    contract_end: '',
-    payment_status: 'pending',
+    full_name: tenant?.full_name || '',
+    email: tenant?.email || '',
+    phone: tenant?.phone || '',
+    property_id: (tenant as any)?.property_id || '',
+    contract_start: dateOnly((tenant as any)?.contract_start) || new Date().toISOString().split('T')[0],
+    contract_end: dateOnly((tenant as any)?.contract_end) || '',
+    payment_status: (tenant as any)?.payment_status || 'pending',
   })
   const [properties, setProperties] = useState<{ id: string; name: string; address: string }[]>([])
   const [saving, setSaving] = useState(false)
@@ -36,12 +42,12 @@ export default function AddTenantModal({ onClose, onSaved }: Props) {
     setSaving(true)
     setError('')
     const res = await fetch('/api/tenants', {
-      method: 'POST',
+      method: editing ? 'PATCH' : 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, ...(editing ? { id: tenant!.id } : {}) }),
     })
     const data = await res.json()
-    if (res.ok) onSaved(data)
+    if (res.ok && !data.error) onSaved(data)
     else {
       setError(data.error || 'Error al guardar')
       setSaving(false)
@@ -52,7 +58,7 @@ export default function AddTenantModal({ onClose, onSaved }: Props) {
     <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-y-auto max-h-[90vh]">
         <div className="flex items-center justify-between p-6 border-b border-outline-variant">
-          <h2 className="text-2xl font-bold text-primary">Agregar Inquilino</h2>
+          <h2 className="text-2xl font-bold text-primary">{editing ? 'Editar Inquilino' : 'Agregar Inquilino'}</h2>
           <button onClick={onClose} className="w-10 h-10 rounded-full hover:bg-surface-container-high flex items-center justify-center">
             <span className="material-symbols-outlined">close</span>
           </button>
@@ -108,7 +114,7 @@ export default function AddTenantModal({ onClose, onSaved }: Props) {
           <button onClick={onClose} className="flex-1 py-3 border border-outline text-primary rounded-lg font-bold text-[11px] tracking-wider hover:bg-surface-container-low">CANCELAR</button>
           <button onClick={save} disabled={saving} className="flex-[2] py-3 bg-primary text-white rounded-lg font-bold text-[11px] tracking-wider hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2">
             <span className="material-symbols-outlined text-sm">{saving ? 'refresh' : 'save'}</span>
-            {saving ? 'GUARDANDO...' : 'GUARDAR INQUILINO'}
+            {saving ? 'GUARDANDO...' : (editing ? 'GUARDAR CAMBIOS' : 'GUARDAR INQUILINO')}
           </button>
         </div>
       </div>

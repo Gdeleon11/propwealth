@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { Property } from '@/lib/db'
+import { formatMoney as fmt, formatMoneyShort as fmtK } from '@/lib/format'
 
 type DashData = {
   totalPortfolioValue: number
@@ -13,15 +14,6 @@ type DashData = {
   monthly?: { month: string; income: number; expense: number }[]
   expenseBreakdown?: { label: string; amount: number; pct: number }[]
   recentTransactions: { entity: string; type: string; amount: number; status: string; created_at: string }[]
-}
-
-function fmt(n: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
-}
-
-function fmtK(n: number) {
-  if (n >= 1000) return `$${(n / 1000).toFixed(1)}k`
-  return `$${n.toFixed(0)}`
 }
 
 const DONUT_COLORS = ['bg-primary', 'bg-secondary', 'bg-primary-fixed-dim', 'bg-outline-variant', 'bg-tertiary-container']

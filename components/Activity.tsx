@@ -2,6 +2,19 @@
 
 import { useMemo, useState, useEffect } from 'react'
 import AddTransactionModal from './AddTransactionModal'
+import { formatMoney } from '@/lib/format'
+
+function groupForDate(iso: string): 'HOY' | 'AYER' | 'ESTA SEMANA' | 'ANTERIORES' {
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return 'ANTERIORES'
+  const now = new Date()
+  const startOfDay = (x: Date) => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime()
+  const days = Math.round((startOfDay(now) - startOfDay(d)) / 86400000)
+  if (days <= 0) return 'HOY'
+  if (days === 1) return 'AYER'
+  if (days <= 7) return 'ESTA SEMANA'
+  return 'ANTERIORES'
+}
 
 type ActivityItem = {
   id: string
@@ -13,7 +26,7 @@ type ActivityItem = {
   tone: 'success' | 'warning' | 'neutral' | 'danger'
   amount?: string
   status?: string
-  group?: 'HOY' | 'AYER' | 'ESTA SEMANA'
+  group?: 'HOY' | 'AYER' | 'ESTA SEMANA' | 'ANTERIORES'
 }
 
 // Transform database transactions into activity items
@@ -25,8 +38,9 @@ function getActivityFromTransactions(transactions: any[]): ActivityItem[] {
     detail: t.entity,
     meta: new Date(t.created_at).toLocaleString('es'),
     icon: t.type === 'income' ? 'check_circle' : 'remove',
-    tone: t.status === 'processed' ? 'success' : t.type === 'income' ? 'success' : 'warning',
-    amount: `${t.type === 'income' ? '+' : '-'}$${Number(t.amount || 0).toFixed(2)}`,
+    tone: (t.status === 'processed' ? 'success' : t.type === 'income' ? 'success' : 'warning') as ActivityItem['tone'],
+    amount: `${t.type === 'income' ? '+' : '-'}${formatMoney(Math.abs(Number(t.amount || 0)), { maximumFractionDigits: 2 })}`,
+    group: groupForDate(t.created_at),
   }))
 }
 
@@ -89,7 +103,7 @@ export default function Activity({ onBack }: Props) {
     })
   }, [filter, query, activities])
 
-  const groups = ['HOY', 'AYER', 'ESTA SEMANA'] as const
+  const groups = ['HOY', 'AYER', 'ESTA SEMANA', 'ANTERIORES'] as const
 
   return (
     <div className="px-6 py-6 max-w-3xl mx-auto">
@@ -131,6 +145,15 @@ export default function Activity({ onBack }: Props) {
       </div>
 
       <div className="space-y-6">
+        {loading ? (
+          <p className="text-center text-on-surface-variant py-10">Cargando movimientos...</p>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16">
+            <span className="material-symbols-outlined text-[64px] text-outline-variant">receipt_long</span>
+            <p className="text-on-surface-variant mt-4 font-semibold">Sin movimientos aún</p>
+            <p className="text-sm text-on-surface-variant mt-1">Usa el botón + para registrar un ingreso o gasto.</p>
+          </div>
+        ) : null}
         {groups.map((group) => {
           const items = filtered.filter((item) => item.group === group)
           if (items.length === 0) return null
