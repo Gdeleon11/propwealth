@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
-import { DEMO_DASHBOARD } from '@/lib/demo-data'
+import { getServerSession } from 'next-auth/next'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,14 +11,58 @@ function sql() {
 }
 
 export async function GET() {
+  const session = await getServerSession()
+  if (!session?.user?.email) {
+    return NextResponse.json({
+      totalPortfolioValue: 0,
+      monthlyIncome: 0,
+      netCashFlow: 0,
+      avgRoi: 0,
+      occupancyRate: 0,
+      totalProperties: 0,
+      overduePayments: 0,
+      pendingPayments: 0,
+      recentTransactions: [],
+    })
+  }
+
   const db = sql()
-  if (!db) return NextResponse.json(DEMO_DASHBOARD)
+  if (!db) {
+    return NextResponse.json({
+      totalPortfolioValue: 0,
+      monthlyIncome: 0,
+      netCashFlow: 0,
+      avgRoi: 0,
+      occupancyRate: 0,
+      totalProperties: 0,
+      overduePayments: 0,
+      pendingPayments: 0,
+      recentTransactions: [],
+    })
+  }
 
   try {
+    // Get user ID
+    const users = (await db`SELECT id FROM users WHERE email = ${session.user.email}`) as any[]
+    const userId = users[0]?.id
+    if (!userId) {
+      return NextResponse.json({
+        totalPortfolioValue: 0,
+        monthlyIncome: 0,
+        netCashFlow: 0,
+        avgRoi: 0,
+        occupancyRate: 0,
+        totalProperties: 0,
+        overduePayments: 0,
+        pendingPayments: 0,
+        recentTransactions: [],
+      })
+    }
+
     const [properties, tenants, transactions] = (await Promise.all([
-      db`SELECT purchase_value, monthly_rent, cash_flow, roi_pct, status FROM properties`,
-      db`SELECT payment_status FROM tenants`,
-      db`SELECT amount, type, entity, status, created_at FROM transactions ORDER BY created_at DESC LIMIT 5`,
+      db`SELECT purchase_value, monthly_rent, cash_flow, roi_pct, status FROM properties WHERE user_id = ${userId}`,
+      db`SELECT payment_status FROM tenants WHERE user_id = ${userId}`,
+      db`SELECT amount, type, entity, status, created_at FROM transactions WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 5`,
     ])) as [any[], any[], any[]]
 
     const totalPortfolioValue = properties.reduce((s: number, p: any) => s + Number(p.purchase_value || 0), 0)
@@ -45,6 +89,16 @@ export async function GET() {
       recentTransactions: transactions,
     })
   } catch (e: any) {
-    return NextResponse.json(DEMO_DASHBOARD)
+    return NextResponse.json({
+      totalPortfolioValue: 0,
+      monthlyIncome: 0,
+      netCashFlow: 0,
+      avgRoi: 0,
+      occupancyRate: 0,
+      totalProperties: 0,
+      overduePayments: 0,
+      pendingPayments: 0,
+      recentTransactions: [],
+    })
   }
 }

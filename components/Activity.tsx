@@ -1,10 +1,9 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 
 type ActivityItem = {
   id: string
-  group: 'HOY' | 'AYER' | 'ESTA SEMANA'
   category: 'payments' | 'maintenance' | 'contracts' | 'alerts'
   title: string
   detail: string
@@ -15,62 +14,21 @@ type ActivityItem = {
   status?: string
 }
 
-const activity: ActivityItem[] = [
-  {
-    id: 'rent-skyline',
-    group: 'HOY',
-    category: 'payments',
-    title: 'Pago de Renta Recibido',
-    detail: 'Apt 402 · Skyline Loft',
-    meta: '10:45 AM',
-    icon: 'check_circle',
-    tone: 'success',
-    amount: '+$2,450.00',
-  },
-  {
-    id: 'maintenance-ac',
-    group: 'HOY',
-    category: 'maintenance',
-    title: 'Mantenimiento Completado',
-    detail: 'Revisión de A/C · Torre A',
-    meta: '08:30 AM',
-    icon: 'build',
-    tone: 'warning',
-    status: 'CERRADO',
-  },
-  {
-    id: 'contract-unit-12',
-    group: 'AYER',
-    category: 'contracts',
-    title: 'Contrato Firmado',
-    detail: 'Contrato de Arrendamiento · Unidad 12B',
-    meta: 'Ayer, 04:15 PM',
-    icon: 'description',
-    tone: 'neutral',
-  },
-  {
-    id: 'late-central',
-    group: 'AYER',
-    category: 'alerts',
-    title: 'Alerta de Pago Atrasado',
-    detail: 'Estudio 05 · Central Plaza',
-    meta: 'Ayer, 09:00 AM',
-    icon: 'warning',
-    tone: 'danger',
-    amount: '-$1,800.00',
-  },
-  {
-    id: 'inspection-tower-b',
-    group: 'ESTA SEMANA',
-    category: 'maintenance',
-    title: 'Inspección Programada',
-    detail: 'Inspección de Salida · Torre B',
-    meta: 'Martes',
-    icon: 'visibility',
-    tone: 'neutral',
-    status: 'PENDIENTE',
-  },
-]
+// Transform database transactions into activity items
+function getActivityFromTransactions(transactions: any[]): ActivityItem[] {
+  return transactions.map(t => ({
+    id: t.id,
+    category: t.type === 'income' ? 'payments' : 'maintenance',
+    title: t.type === 'income' ? 'Pago Recibido' : 'Gasto',
+    detail: t.entity,
+    meta: new Date(t.created_at).toLocaleString('es'),
+    icon: t.type === 'income' ? 'check_circle' : 'remove',
+    tone: t.status === 'processed' ? 'success' : t.type === 'income' ? 'success' : 'warning',
+    amount: `${t.type === 'income' ? '+' : '-'}$${t.amount.toFixed(2)}`,
+  }))
+}
+
+const activity: ActivityItem[] = []
 
 const filters = [
   { id: 'all', label: 'Todos' },
@@ -101,15 +59,29 @@ type Props = {
 export default function Activity({ onBack }: Props) {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState<(typeof filters)[number]['id']>('all')
+  const [activities, setActivities] = useState<ActivityItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    // Load transactions from API
+    fetch('/api/transactions')
+      .then(r => r.json())
+      .then(data => {
+        const items = getActivityFromTransactions(Array.isArray(data) ? data : [])
+        setActivities(items)
+        setLoading(false)
+      })
+      .catch(() => setLoading(false))
+  }, [])
 
   const filtered = useMemo(() => {
     const normalized = query.trim().toLowerCase()
-    return activity.filter((item) => {
+    return activities.filter((item) => {
       const matchesFilter = filter === 'all' || item.category === filter
       const matchesQuery = !normalized || `${item.title} ${item.detail}`.toLowerCase().includes(normalized)
       return matchesFilter && matchesQuery
     })
-  }, [filter, query])
+  }, [filter, query, activities])
 
   const groups = ['HOY', 'AYER', 'ESTA SEMANA'] as const
 

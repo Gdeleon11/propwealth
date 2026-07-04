@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { SessionProvider } from 'next-auth/react'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -14,7 +15,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="bg-background text-on-background min-h-screen">
-        {children}
+        <SessionProvider>
+          {children}
+        </SessionProvider>
       </body>
     </html>
   )

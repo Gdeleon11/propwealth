@@ -1,0 +1,81 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { neon } from '@neondatabase/serverless'
+import { getServerSession } from 'next-auth/next'
+
+export const dynamic = 'force-dynamic'
+
+function sql() {
+  const url = process.env.DATABASE_URL
+  if (!url) return null
+  return neon(url)
+}
+
+export async function GET(req: NextRequest) {
+  const session = await getServerSession()
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const db = sql()
+  if (!db) return NextResponse.json([])
+
+  try {
+    // Get user ID
+    const users = (await db`SELECT id FROM users WHERE email = ${session.user.email}`) as any[]
+    const userId = users[0]?.id
+    if (!userId) return NextResponse.json([])
+
+    const rows = (await db`
+      SELECT * FROM transactions
+      WHERE user_id = ${userId}
+      ORDER BY created_at DESC
+      LIMIT 100
+    `) as any[]
+    return NextResponse.json(rows)
+  } catch (e: any) {
+    return NextResponse.json([])
+  }
+}
+
+export async function POST(req: NextRequest) {
+  const session = await getServerSession()
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const db = sql()
+  if (!db) return NextResponse.json({ error: 'Database not available' }, { status: 500 })
+
+  const body = await req.json()
+  if (!body.amount || !body.type || !body.entity) {
+    return NextResponse.json(
+      { error: 'amount, type, entity required' },
+      { status: 400 }
+    )
+  }
+
+  try {
+    // Get user ID
+    const users = (await db`SELECT id FROM users WHERE email = ${session.user.email}`) as any[]
+    const userId = users[0]?.id
+    if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+
+    const rows = (await db`
+      INSERT INTO transactions (user_id, property_id, tenant_id, amount, type, entity, status, description)
+      VALUES (
+        ${userId},
+        ${body.property_id || null},
+        ${body.tenant_id || null},
+        ${Number(body.amount)},
+        ${body.type},
+        ${body.entity},
+        ${body.status || 'pending'},
+        ${body.description || null}
+      )
+      RETURNING *
+    `) as any[]
+    return NextResponse.json(rows[0], { status: 201 })
+  } catch (e: any) {
+    return NextResponse.json({ error: e.message }, { status: 500 })
+  }
+}

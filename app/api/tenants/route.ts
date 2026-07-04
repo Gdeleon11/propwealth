@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { neon } from '@neondatabase/serverless'
-import { DEMO_TENANTS } from '@/lib/demo-data'
+import { getServerSession } from 'next-auth/next'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,75 +11,73 @@ function sql() {
 }
 
 export async function GET(req: NextRequest) {
+  const session = await getServerSession()
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const db = sql()
+  if (!db) return NextResponse.json([])
+
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status')
   const today = new Date().toISOString().split('T')[0]
 
-  if (!db) {
-    const rows = DEMO_TENANTS.filter((tenant) => {
-      if (status === 'current') return tenant.contract_end >= today
-      if (status === 'past') return tenant.contract_end < today
-      return true
-    })
-    return NextResponse.json(rows)
-  }
-
   try {
+    // Get user ID
+    const users = (await db`SELECT id FROM users WHERE email = ${session.user.email}`) as any[]
+    const userId = users[0]?.id
+    if (!userId) return NextResponse.json([])
+
     let rows: any[]
     if (status === 'current') {
       rows = (await db`
         SELECT t.*, p.name AS property_name, p.address AS property_address
         FROM tenants t LEFT JOIN properties p ON p.id = t.property_id
-        WHERE t.contract_end >= ${today} ORDER BY t.created_at DESC
+        WHERE t.user_id = ${userId} AND t.contract_end >= ${today} ORDER BY t.created_at DESC
       `) as any[]
     } else if (status === 'past') {
       rows = (await db`
         SELECT t.*, p.name AS property_name, p.address AS property_address
         FROM tenants t LEFT JOIN properties p ON p.id = t.property_id
-        WHERE t.contract_end < ${today} ORDER BY t.created_at DESC
+        WHERE t.user_id = ${userId} AND t.contract_end < ${today} ORDER BY t.created_at DESC
       `) as any[]
     } else {
       rows = (await db`
         SELECT t.*, p.name AS property_name, p.address AS property_address
         FROM tenants t LEFT JOIN properties p ON p.id = t.property_id
+        WHERE t.user_id = ${userId}
         ORDER BY t.created_at DESC
       `) as any[]
     }
     return NextResponse.json(rows)
   } catch (e: any) {
-    return NextResponse.json(DEMO_TENANTS)
+    return NextResponse.json([])
   }
 }
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession()
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const db = sql()
+  if (!db) return NextResponse.json({ error: 'Database not available' }, { status: 500 })
+
   const body = await req.json()
   if (!body.full_name || !body.email || !body.contract_start || !body.contract_end)
     return NextResponse.json({ error: 'full_name, email, contract_start, contract_end required' }, { status: 400 })
 
-  if (!db) {
-    return NextResponse.json(
-      {
-        id: `demo-${Date.now()}`,
-        property_id: body.property_id || null,
-        full_name: body.full_name,
-        email: body.email,
-        phone: body.phone || null,
-        contract_start: body.contract_start,
-        contract_end: body.contract_end,
-        payment_status: body.payment_status || 'pending',
-        avatar_url: body.avatar_url || null,
-        created_at: new Date().toISOString(),
-      },
-      { status: 201 },
-    )
-  }
-
   try {
+    // Get user ID
+    const users = (await db`SELECT id FROM users WHERE email = ${session.user.email}`) as any[]
+    const userId = users[0]?.id
+    if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+
     const rows = (await db`
-      INSERT INTO tenants (property_id, full_name, email, phone, contract_start, contract_end, payment_status, avatar_url)
-      VALUES (${body.property_id || null}, ${body.full_name}, ${body.email},
+      INSERT INTO tenants (user_id, property_id, full_name, email, phone, contract_start, contract_end, payment_status, avatar_url)
+      VALUES (${userId}, ${body.property_id || null}, ${body.full_name}, ${body.email},
               ${body.phone || null}, ${body.contract_start}, ${body.contract_end},
               ${body.payment_status || 'pending'}, ${body.avatar_url || null})
       RETURNING *
@@ -91,15 +89,25 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const session = await getServerSession()
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const db = sql()
+  if (!db) return NextResponse.json({ error: 'Database not available' }, { status: 500 })
+
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
 
-  if (!db) return NextResponse.json({ ok: true })
-
   try {
-    await db`DELETE FROM tenants WHERE id = ${id}`
+    // Get user ID
+    const users = (await db`SELECT id FROM users WHERE email = ${session.user.email}`) as any[]
+    const userId = users[0]?.id
+    if (!userId) return NextResponse.json({ error: 'User not found' }, { status: 404 })
+
+    await db`DELETE FROM tenants WHERE id = ${id} AND user_id = ${userId}`
     return NextResponse.json({ ok: true })
   } catch (e: any) {
     return NextResponse.json({ error: e.message }, { status: 500 })
